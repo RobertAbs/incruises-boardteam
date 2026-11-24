@@ -17,19 +17,23 @@ gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, DrawSVGPlugin);
  * и toggleActions для анимаций.
  */
 const nativeCreate = ScrollTrigger.create.bind(ScrollTrigger);
-(ScrollTrigger as any).create = (vars: ScrollTrigger.Vars & { animation?: unknown }) => {
-  if (!vars?.once) return nativeCreate(vars);
+// GSAP вызывает create(vars, animation) — второй аргумент обязательно передаём дальше.
+(ScrollTrigger as any).create = (vars: ScrollTrigger.Vars, animation?: gsap.core.Animation) => {
+  if (!vars?.once) return (nativeCreate as any)(vars, animation);
   const { once: _once, onEnter, ...rest } = vars;
   let done = false;
-  return nativeCreate({
-    ...rest,
-    ...(rest.animation ? { toggleActions: 'play none none none' } : {}),
-    onEnter: (self) => {
-      if (done) return;
-      done = true;
-      onEnter?.(self);
+  return (nativeCreate as any)(
+    {
+      ...rest,
+      ...(animation ? { toggleActions: 'play none none none' } : {}),
+      onEnter: (self: ScrollTrigger) => {
+        if (done) return;
+        done = true;
+        onEnter?.(self);
+      },
     },
-  });
+    animation,
+  );
 };
 
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
