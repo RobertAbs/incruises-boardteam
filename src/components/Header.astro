@@ -1,0 +1,102 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/incruises-logo.png';
+import boardteam from '../assets/brand/boardteam.png';
+import { nav, contactLink } from '../config';
+---
+
+<header id="site-header" class="fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-(--ease-out-expo)">
+  <div class="container-x pt-3">
+    <div
+      id="header-bar"
+      class="flex h-16 items-center justify-between gap-4 rounded-full border border-white/10 bg-ink/40 pr-2 pl-4 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-colors duration-500 sm:pl-5"
+    >
+      <a href="#top" class="flex shrink-0 items-center gap-3" aria-label="inCruises — на главную">
+        <span class="grid h-10 place-items-center rounded-xl bg-white px-2.5">
+          <Image src={logo} alt="inCruises Independent Partner" class="h-6 w-auto" width={180} />
+        </span>
+        <span class="hidden h-7 w-px bg-white/20 sm:block"></span>
+        <Image src={boardteam} alt="BoardTeam International team" class="hidden h-7 w-auto opacity-90 sm:block" width={200} />
+      </a>
+
+      <nav class="hidden items-center gap-1 lg:flex" aria-label="Разделы">
+        {
+          nav.map((n) => (
+            <a href={n.href} class="rounded-full px-3.5 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
+              {n.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href={contactLink()} class="btn-brand !px-5 !py-2.5 text-sm">Вступить в клуб</a>
+        <button
+          id="menu-btn"
+          class="grid h-11 w-11 place-items-center rounded-full text-white hover:bg-white/10 lg:hidden"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path class="origin-center transition-transform duration-300" d="M4 8h16"></path>
+            <path class="origin-center transition-transform duration-300" d="M4 16h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="mobile-menu"
+      class="pointer-events-none mt-2 origin-top scale-95 rounded-4xl border border-white/10 bg-ink/90 p-3 opacity-0 backdrop-blur-xl transition duration-300 ease-(--ease-out-expo) lg:hidden"
+    >
+      {
+        nav.map((n) => (
+          <a href={n.href} class="block rounded-2xl px-4 py-3.5 font-display text-lg font-semibold text-white hover:bg-white/10">
+            {n.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Прогресс прокрутки: кораблик идёт по линии -->
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-transparent">
+    <div id="scroll-progress" class="h-full origin-left scale-x-0 bg-gradient-to-r from-aqua via-sea to-brand"></div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById('site-header')!;
+  const bar = document.getElementById('header-bar')!;
+  const btn = document.getElementById('menu-btn')!;
+  const menu = document.getElementById('mobile-menu')!;
+  const progress = document.getElementById('scroll-progress')!;
+
+  let open = false;
+  const setOpen = (v: boolean) => {
+    open = v;
+    btn.setAttribute('aria-expanded', String(v));
+    menu.classList.toggle('opacity-0', !v);
+    menu.classList.toggle('scale-95', !v);
+    menu.classList.toggle('pointer-events-none', !v);
+    const [a, b] = btn.querySelectorAll('path');
+    a.style.transform = v ? 'translateY(4px) rotate(45deg)' : '';
+    b.style.transform = v ? 'translateY(-4px) rotate(-45deg)' : '';
+  };
+  btn.addEventListener('click', () => setOpen(!open));
+  document.addEventListener('nav:close', () => setOpen(false));
+
+  let last = 0;
+  const onScroll = () => {
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+    bar.classList.toggle('bg-ink/80', y > 40);
+    const hide = y > 400 && y > last && !open;
+    header.style.transform = hide ? 'translateY(-120%)' : '';
+    last = y;
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

@@ -1,0 +1,84 @@
+---
+import Icon from './art/Icon.astro';
+import { bonuses, perks, payouts } from '../data/content';
+---
+
+<section id="rewards" class="grain relative overflow-hidden bg-ink py-[clamp(72px,10vw,140px)] text-white">
+  <div class="pointer-events-none absolute top-1/3 -left-40 h-[500px] w-[500px] rounded-full bg-ocean/30 blur-[120px]"></div>
+  <div class="container-x relative">
+    <div class="mb-12 max-w-[760px] md:mb-16">
+      <p class="eyebrow mb-5 bg-white/10 text-brand" data-reveal><Icon name="sparkle" size={14} /> Компенсационный план</p>
+      <h2 class="h-section" data-split>Щедрые <span class="text-gradient-brand">вознаграждения</span></h2>
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+      <!-- Денежные бонусы -->
+      <div class="card-glass p-3 sm:p-4" data-reveal>
+        <ol>
+          {
+            bonuses.map((b, i) => (
+              <li
+                class:list={[
+                  'bonus-row group flex flex-col gap-1 rounded-3xl px-4 py-4 transition-colors duration-300 hover:bg-white/[0.06] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-5',
+                  b.highlight && 'bg-gradient-to-r from-brand/20 to-transparent',
+                ]}
+              >
+                <span class="flex items-center gap-4">
+                  <span class="num w-7 text-sm text-white/40">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="text-[17px] font-bold">{b.name}</span>
+                </span>
+                <span class:list={['num pl-11 text-lg sm:pl-0', b.highlight ? 'text-brand' : 'text-aqua']}>{b.range}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <!-- Телефон с платёжными системами -->
+      <div class="relative flex items-center justify-center py-6" data-reveal>
+        <div class="absolute h-80 w-80 rounded-full bg-brand/20 blur-3xl"></div>
+        <div class="relative w-[260px] rotate-[4deg] rounded-[2.6rem] bg-[#0b0f17] p-2.5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] ring-1 ring-white/20" data-tilt="10">
+          <div class="relative overflow-hidden rounded-[2.1rem] bg-[#f3f5f9] px-4 pt-12 pb-6 text-ink">
+            <div class="absolute top-2 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-[#0b0f17]"></div>
+            <p class="mb-4 text-center text-[11px] font-bold tracking-[0.2em] text-muted uppercase">Вывод средств</p>
+            <ul class="space-y-2.5">
+              {
+                payouts.map((p, i) => (
+                  <li class="payout flex items-center justify-between rounded-2xl bg-white px-4 py-3.5 shadow-[0_1px_0_rgba(6,21,43,0.06)]">
+                    <span class:list={['font-display text-[15px] font-bold', i === 0 ? 'text-brand' : 'text-ocean']}>{p}</span>
+                    <span class="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/15 text-emerald-600">
+                      <Icon name="check" size={14} />
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Клубные привилегии -->
+    <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        perks.map((p) => (
+          <article class="card-glass group relative overflow-hidden p-6 sm:p-7" data-reveal>
+            <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-brand transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+              <Icon name={p.icon} size={24} />
+            </span>
+            <p class="mt-6 font-display text-lg font-bold">{p.name}</p>
+            <p class="mt-2 text-white/65">{p.value}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../scripts/motion';
+  if (!reduce) {
+    gsap.from('.bonus-row', { x: -30, opacity: 0, stagger: 0.07, duration: 0.8, ease: 'expo.out', scrollTrigger: { trigger: '.bonus-row', start: 'top 85%', once: true } });
+    gsap.from('.payout', { y: 30, opacity: 0, scale: 0.9, stagger: 0.12, duration: 0.8, ease: 'back.out(1.6)', scrollTrigger: { trigger: '.payout', start: 'top 90%', once: true } });
+  }
+</script>

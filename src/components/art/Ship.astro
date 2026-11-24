@@ -1,0 +1,72 @@
+---
+/** Векторный круизный лайнер, вид сбоку (нос вправо). */
+interface Props {
+  class?: string;
+  id?: string;
+}
+const { class: cls = '', id } = Astro.props;
+const uid = id ?? 'ship';
+---
+
+<svg {id} class={cls} viewBox="0 0 640 230" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Круизный лайнер">
+  <defs>
+    <linearGradient id={`${uid}-hull`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="1" stop-color="#dfe8f3"></stop>
+    </linearGradient>
+    <linearGradient id={`${uid}-deck`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="1" stop-color="#e8eef6"></stop>
+    </linearGradient>
+    <linearGradient id={`${uid}-glass`} x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0d3466"></stop>
+      <stop offset=".6" stop-color="#1b5ea8"></stop>
+      <stop offset="1" stop-color="#6fd8ff"></stop>
+    </linearGradient>
+    <linearGradient id={`${uid}-shade`} x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#06152b" stop-opacity=".18"></stop>
+      <stop offset=".5" stop-color="#06152b" stop-opacity="0"></stop>
+    </linearGradient>
+    <pattern id={`${uid}-win`} width="9" height="7" patternUnits="userSpaceOnUse">
+      <rect x="1" y="1.5" width="6" height="3.5" rx="1" fill={`url(#${uid}-glass)`}></rect>
+    </pattern>
+    <pattern id={`${uid}-port`} width="12" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="5" r="1.8" fill="#0d3466"></circle>
+    </pattern>
+  </defs>
+
+  <!-- Труба -->
+  <g>
+    <path d="M300 14h58l-8 38h-54z" fill="#ffffff"></path>
+    <path d="M300 14h58l-2 10h-56z" fill="#06152b"></path>
+    <rect x="312" y="28" width="26" height="18" rx="4" fill="#f7941d"></rect>
+    <text x="325" y="42" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-weight="700" font-size="14" fill="#fff">in</text>
+  </g>
+
+  <!-- Надстройка (палубы) -->
+  <path d="M168 52h330c14 0 26 6 34 14l6 6H160z" fill={`url(#${uid}-deck)`}></path>
+  <rect x="176" y="57" width="300" height="9" fill={`url(#${uid}-win)`}></rect>
+  <path d="M120 72h440l16 22H104z" fill={`url(#${uid}-deck)`}></path>
+  <rect x="124" y="77" width="430" height="11" fill={`url(#${uid}-win)`}></rect>
+  <path d="M84 94h510l14 24H70z" fill={`url(#${uid}-deck)`}></path>
+  <rect x="88" y="99" width="500" height="12" fill={`url(#${uid}-win)`}></rect>
+  <!-- Мостик -->
+  <path d="M520 66h26l14 8h-40z" fill="#0d3466"></path>
+  <path d="M562 94l20 0 12 6h-30z" fill="#0d3466" opacity=".8"></path>
+
+  <!-- Шлюпки -->
+  {
+    [150, 215, 280, 345, 410, 475].map((x) => (
+      <rect x={x} y="112" width="38" height="7" rx="3.5" fill="#f7941d" />
+    ))
+  }
+
+  <!-- Корпус -->
+  <path d="M22 118h582c12 0 22-2 32-8l-30 92H58c-14-16-26-46-36-84z" fill={`url(#${uid}-hull)`}></path>
+  <rect x="44" y="130" width="560" height="10" fill={`url(#${uid}-port)`}></rect>
+  <path d="M30 150h596l-3 9H33z" fill="#f7941d"></path>
+  <path d="M35 160h588l-17 42H58c-8-9-16-23-23-42z" fill="#0a2244"></path>
+  <path d="M22 118h582c12 0 22-2 32-8l-30 92H58c-14-16-26-46-36-84z" fill={`url(#${uid}-shade)`}></path>
+  <!-- Надпись на борту -->
+  <text x="520" y="146" text-anchor="end" font-family="Arial, sans-serif" font-weight="800" letter-spacing="3" font-size="11" fill="#0a2244" opacity=".85">INCRUISES</text>
+</svg>

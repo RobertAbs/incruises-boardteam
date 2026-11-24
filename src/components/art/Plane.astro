@@ -1,0 +1,17 @@
+---
+/** Силуэт самолёта (нос вправо), центр в (0,0) — удобно для MotionPath. */
+interface Props {
+  id?: string;
+  class?: string;
+  scale?: number;
+}
+const { id, class: cls = '', scale = 1 } = Astro.props;
+---
+
+<g {id} class={cls}>
+  <g transform={`scale(${scale}) translate(-32 -32)`}>
+    <path
+      d="M60 32c0-2.4-2.6-3.6-5.5-3.6H40.5L28.4 9.5c-.5-.8-1.4-1.3-2.4-1.3h-3.4l7 20.2H17.2l-4.6-6.2c-.4-.5-1-.8-1.6-.8H8.3l3.4 10.6-3.4 10.6H11c.6 0 1.2-.3 1.6-.8l4.6-6.2h12.4l-7 20.2H26c1 0 1.9-.5 2.4-1.3l12.1-18.9h14C57.4 35.6 60 34.4 60 32z"
+      fill="white"></path>
+  </g>
+</g>

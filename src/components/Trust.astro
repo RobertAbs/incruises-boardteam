@@ -1,0 +1,98 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './art/Icon.astro';
+import { registrations } from '../data/content';
+import sealCa from '../assets/brand/seal-ca.png';
+import sealFl from '../assets/brand/seal-fl.png';
+import sealWa from '../assets/brand/seal-wa.png';
+import tmt from '../assets/brand/logo-trustmytravel.png';
+import clia from '../assets/brand/logo-clia.png';
+import maw from '../assets/brand/logo-makeawish.png';
+import ocean from '../assets/brand/logo-4ocean.png';
+import mercy from '../assets/brand/logo-mercyships.png';
+
+const seals = { ca: sealCa, fl: sealFl, wa: sealWa } as const;
+const charity = [
+  { src: maw, alt: 'Make-A-Wish', h: 'h-9' },
+  { src: ocean, alt: '4ocean', h: 'h-8' },
+  { src: mercy, alt: 'Mercy Ships', h: 'h-14' },
+];
+---
+
+<section id="trust" class="grain relative overflow-hidden bg-ink py-[clamp(72px,10vw,140px)] text-white">
+  <div class="pointer-events-none absolute top-0 left-1/2 h-[600px] w-[1100px] -translate-x-1/2 rounded-full bg-ocean/25 blur-[120px]"></div>
+
+  <div class="container-x relative">
+    <div class="mx-auto mb-14 max-w-[880px] text-center md:mb-20">
+      <p class="eyebrow mb-5 bg-white/10 text-aqua" data-reveal><Icon name="shield" size={14} /> Надёжность</p>
+      <h2 class="h-section" data-split>
+        Легальность. Надёжность. <span class="text-gradient-sea">Благотворительность.</span>
+      </h2>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3 lg:gap-5">
+      {
+        registrations.map((r) => (
+          <article class="card-glass group relative overflow-hidden p-7 text-center sm:p-8" data-reveal data-tilt="6">
+            <div class="seal mx-auto mb-6 h-32 w-32 rounded-full p-1 ring-1 ring-white/15 transition-transform duration-700 group-hover:rotate-[18deg]">
+              <Image src={seals[r.seal]} alt={`Печать штата`} class="h-full w-full rounded-full" width={256} />
+            </div>
+            <p class="text-sm font-semibold text-white/60">Регистрационный номер {r.prep}</p>
+            <p class="mt-1 font-display text-xl font-bold text-aqua uppercase">{r.state}</p>
+            <p class="num mt-4 inline-block rounded-full bg-white/10 px-4 py-2 text-lg">№ {r.number}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="mt-4 grid gap-4 md:grid-cols-2 lg:mt-5 lg:gap-5">
+      <div class="flex flex-col items-center justify-between gap-6 rounded-4xl bg-white p-7 text-ink sm:flex-row sm:p-8" data-reveal>
+        <div>
+          <p class="text-xs font-bold tracking-[0.18em] text-muted uppercase">Защита средств</p>
+          <p class="mt-1 font-display text-lg font-bold">Партнёр по безопасным платежам</p>
+        </div>
+        <Image src={tmt} alt="Trust My Travel" class="h-10 w-auto" width={360} />
+      </div>
+      <div class="flex flex-col items-center justify-between gap-6 rounded-4xl bg-white p-7 text-ink sm:flex-row sm:p-8" data-reveal>
+        <div>
+          <p class="text-xs font-bold tracking-[0.18em] text-muted uppercase">Член ассоциации</p>
+          <p class="mt-1 font-display text-lg font-bold">CLIA #00027506</p>
+        </div>
+        <Image src={clia} alt="Cruise Lines International Association" class="h-12 w-auto" width={360} />
+      </div>
+    </div>
+
+    <!-- Благотворительность: бегущая строка -->
+    <div class="mt-16 md:mt-20" data-reveal>
+      <p class="mb-8 text-center text-xs font-bold tracking-[0.22em] text-white/50 uppercase">Благотворительные партнёры</p>
+      <div class="marquee relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_15%,black_85%,transparent)]">
+        <div class="marquee-track flex w-max items-center gap-20 pr-20" style="--marquee-speed: 30s">
+          {
+            [...Array(4)].flatMap((_, k) =>
+              charity.map((c) => (
+                <Image src={c.src} alt={k === 0 ? c.alt : ''} aria-hidden={k > 0 ? 'true' : undefined} class={`${c.h} w-auto opacity-80 brightness-0 invert`} width={320} />
+              )),
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../scripts/motion';
+  if (!reduce) {
+    gsap.utils.toArray<HTMLElement>('.seal').forEach((el, i) => {
+      gsap.from(el, {
+        rotate: -180,
+        scale: 0.4,
+        opacity: 0,
+        duration: 1.6,
+        delay: i * 0.15,
+        ease: 'back.out(1.4)',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      });
+    });
+  }
+</script>

@@ -1,0 +1,113 @@
+---
+import { savings } from '../data/content';
+const R = 54;
+const C = 2 * Math.PI * R;
+---
+
+<section id="savings" class="relative overflow-hidden bg-sand py-[clamp(72px,10vw,140px)]">
+  <div class="pointer-events-none absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-brand/15 blur-[100px]"></div>
+  <div class="container-x relative">
+    <div class="mb-12 max-w-[860px] md:mb-16">
+      <p class="eyebrow mb-5 bg-brand/10 text-brand-600" data-reveal>Клубная выгода</p>
+      <h2 class="h-section" data-split>С 2015 года inCruises сделал роскошные путешествия более:</h2>
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-3">
+      {
+        savings.map((s, i) => (
+          <article
+            class:list={[
+              'group relative flex flex-col overflow-hidden rounded-5xl p-7 sm:p-9',
+              i === 2 ? 'bg-ink text-white' : 'card',
+            ]}
+            data-reveal
+            data-tilt="5"
+          >
+            <p class:list={['font-display text-2xl font-bold sm:text-3xl', i === 2 ? 'text-white' : 'text-ink']}>{s.word}</p>
+            <p class:list={['mt-1 text-sm font-bold tracking-wider uppercase', i === 2 ? 'text-white/50' : 'text-muted']}>{s.caption}</p>
+
+            <div class="relative mx-auto my-8 grid h-52 w-52 place-items-center">
+              <svg class="absolute inset-0 -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r={R} fill="none" stroke={i === 2 ? 'rgba(255,255,255,.08)' : 'rgba(6,21,43,.06)'} stroke-width="10" />
+                <circle
+                  class="ring-progress"
+                  data-value={s.to}
+                  cx="60"
+                  cy="60"
+                  r={R}
+                  fill="none"
+                  stroke={`url(#ring-${i})`}
+                  stroke-width="10"
+                  stroke-linecap="round"
+                  stroke-dasharray={`${(C * s.to) / 100} ${C}`}
+                />
+                <defs>
+                  <linearGradient id={`ring-${i}`} x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color={i === 0 ? '#6fd8ff' : i === 1 ? '#ffb347' : '#ffd36e'} />
+                    <stop offset="1" stop-color={i === 0 ? '#0f5fb5' : i === 1 ? '#f7941d' : '#d9a441'} />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="text-center">
+                <p class:list={['text-sm font-bold', i === 2 ? 'text-white/50' : 'text-muted']}>{s.prefix}</p>
+                <p class:list={['num flex items-baseline justify-center leading-none', s.from ? 'text-[2.7rem]' : 'text-[3.4rem]']}>
+                  {s.from && <span class="text-[1.6rem] opacity-60">{s.from}–</span>}
+                  <span data-count={s.to} data-suffix="%" data-delay={i * 200}>{s.to}%</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Визуал карты -->
+            <div class="relative mb-7 h-28">
+              {s.visual === 'insider' && (
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="relative -rotate-6 rounded-2xl bg-gradient-to-br from-brand to-[#ff6a3d] px-6 py-4 text-white shadow-xl transition-transform duration-500 group-hover:rotate-0">
+                    <p class="text-[10px] font-bold tracking-[0.2em] uppercase opacity-80">Insider price</p>
+                    <p class="num text-3xl">−17%</p>
+                    <span class="absolute -top-2 -right-2 grid h-7 w-7 place-items-center rounded-full bg-white text-xs text-brand shadow">★</span>
+                  </div>
+                </div>
+              )}
+              {s.visual === 'rp' && (
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="relative h-28 w-48 -rotate-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1b5ea8] via-[#0d3466] to-[#06152b] p-4 text-white shadow-xl transition-transform duration-500 group-hover:rotate-0">
+                    <div class="absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-brand/80 blur-xl" />
+                    <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-white/80 text-xs font-black">RP</span>
+                    <p class="absolute bottom-3 left-4 text-[10px] font-bold tracking-[0.18em] uppercase opacity-80">Баланс бонусных баллов</p>
+                  </div>
+                </div>
+              )}
+              {s.visual === 'black' && (
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="relative h-28 w-48 -rotate-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#3a3a3f] via-[#121214] to-black p-4 text-white shadow-[0_20px_40px_-10px_rgba(0,0,0,0.8)] ring-1 ring-white/15 transition-transform duration-500 group-hover:rotate-0">
+                    <div class="absolute inset-0 bg-[linear-gradient(115deg,transparent_30%,rgba(255,255,255,0.18)_45%,transparent_60%)] bg-[length:250%_100%] transition-[background-position] duration-1000 group-hover:bg-[position:100%_0]" />
+                    <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-gold text-xs font-black text-gold">RP</span>
+                    <p class="absolute bottom-3 left-4 text-[10px] font-bold tracking-[0.18em] text-gold uppercase">Black card</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div class:list={['mt-auto border-t pt-6', i === 2 ? 'border-white/10' : 'border-ink/10']}>
+              <p class:list={['font-display text-lg font-bold', i === 2 ? 'text-gold' : 'text-ocean']}>{s.title}</p>
+              <p class:list={['mt-1', i === 2 ? 'text-white/70' : 'text-muted']}>{s.text}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../scripts/motion';
+  if (!reduce) {
+    document.querySelectorAll<SVGCircleElement>('.ring-progress').forEach((c, i) => {
+      gsap.fromTo(
+        c,
+        { drawSVG: '0%' },
+        { drawSVG: `${c.dataset.value}%`, duration: 2.2, delay: i * 0.2, ease: 'expo.out', scrollTrigger: { trigger: c, start: 'top 85%', once: true } },
+      );
+    });
+  }
+</script>

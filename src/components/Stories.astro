@@ -1,0 +1,127 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import Icon from './art/Icon.astro';
+import director from '../assets/stories/director.jpg';
+import river from '../assets/stories/family-river.jpg';
+import airport from '../assets/stories/airport.jpg';
+import dinner from '../assets/stories/ship-dinner.jpg';
+import dubai from '../assets/stories/dubai.jpg';
+import abuDhabi from '../assets/stories/abu-dhabi.jpg';
+import atriumPoster from '../assets/stories/ship-atrium-poster.jpg';
+import dreamPoster from '../assets/stories/dream-poster.jpg';
+import atriumVideo from '../assets/video/ship-atrium.mp4?url';
+import dreamVideo from '../assets/video/dream.mp4?url';
+
+const atriumP = await getImage({ src: atriumPoster, width: 480, format: 'webp' });
+const dreamP = await getImage({ src: dreamPoster, width: 352, format: 'webp' });
+
+type Item =
+  | { kind: 'img'; src: ImageMetadata; alt: string; caption: string; pos?: string }
+  | { kind: 'video'; src: string; poster: string; caption: string };
+
+const items: Item[] = [
+  { kind: 'video', src: atriumVideo, poster: atriumP.src, caption: 'Атриум лайнера' },
+  { kind: 'img', src: dinner, alt: 'Семья за ужином в ресторане круизного лайнера', caption: 'Ужин на борту' },
+  { kind: 'img', src: abuDhabi, alt: 'Семья в Warner Bros. World Абу-Даби', caption: 'Абу-Даби' },
+  { kind: 'video', src: dreamVideo, poster: dreamP.src, caption: 'До исполнения мечты 3… 2…' },
+  { kind: 'img', src: dubai, alt: 'Отец с сыновьями в Дубай Марине', caption: 'Дубай' },
+  { kind: 'img', src: airport, alt: 'Семья в аэропорту перед вылетом', caption: 'В путь всей семьёй' },
+  { kind: 'img', src: river, alt: 'Семья на набережной', caption: 'Время вместе' },
+];
+---
+
+<section id="stories" class="relative overflow-hidden bg-ink py-[clamp(72px,10vw,140px)] text-white">
+  <div class="container-x">
+    <div class="mb-12 flex flex-col justify-between gap-8 md:mb-14 lg:flex-row lg:items-end">
+      <div class="max-w-[720px]">
+        <p class="eyebrow mb-5 bg-white/10 text-aqua" data-reveal>Команда BoardTeam</p>
+        <h2 class="h-section" data-split>Путешествуем <span class="text-gradient-brand">вместе</span></h2>
+        <p class="lead mt-5 text-white/65" data-reveal>Реальные истории участников клуба: семьи, дети, новые страны и&nbsp;мечты, которые сбываются.</p>
+      </div>
+      <div class="flex gap-2" data-reveal>
+        <button id="stories-prev" class="grid h-12 w-12 place-items-center rounded-full border border-white/15 transition hover:bg-white/10" aria-label="Назад">
+          <Icon name="arrow" size={20} class="rotate-180" />
+        </button>
+        <button id="stories-next" class="grid h-12 w-12 place-items-center rounded-full bg-white text-ink transition hover:bg-brand hover:text-white" aria-label="Вперёд">
+          <Icon name="arrow" size={20} />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="stories-track"
+    class="flex cursor-grab snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] active:cursor-grabbing scroll-px-4 sm:px-6 sm:scroll-px-6 lg:px-[max(2rem,calc((100vw-1240px)/2+2rem))] lg:scroll-px-[max(2rem,calc((100vw-1240px)/2+2rem))]"
+    data-lenis-prevent-wheel
+  >
+    <!-- Карточка лидера -->
+    <figure class="story relative aspect-[1178/975] h-[min(110vw,440px)] shrink-0 snap-start overflow-hidden rounded-4xl bg-ocean" data-reveal>
+      <Picture src={director} alt="Данияр Керимбаев — Marketing Director inCruises" widths={[540, 1080]} sizes="540px" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+    </figure>
+
+    {
+      items.map((it) => (
+        <figure class="story relative aspect-[9/16] h-[min(110vw,440px)] shrink-0 snap-start overflow-hidden rounded-4xl bg-navy" data-reveal>
+          {it.kind === 'img' ? (
+            <Picture src={it.src} alt={it.alt} widths={[260, 520]} sizes="260px" formats={['avif', 'webp']} class="h-full w-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
+          ) : (
+            <>
+              <video class="story-video h-full w-full object-cover" src={it.src} poster={it.poster} muted loop playsinline preload="none" aria-label={it.caption} />
+              <span class="absolute top-4 right-4 grid h-9 w-9 place-items-center rounded-full bg-white/20 backdrop-blur-md">
+                <Icon name="play" size={14} />
+              </span>
+            </>
+          )}
+          <figcaption class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent p-5 pt-14 text-sm font-bold">{it.caption}</figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  const track = document.getElementById('stories-track')!;
+  const step = () => (track.querySelector<HTMLElement>('.story')?.offsetWidth ?? 280) + 16;
+  document.getElementById('stories-next')!.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+  document.getElementById('stories-prev')!.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+
+  // Перетаскивание мышью
+  let down = false;
+  let startX = 0;
+  let startLeft = 0;
+  let moved = false;
+  track.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    down = true;
+    moved = false;
+    startX = e.clientX;
+    startLeft = track.scrollLeft;
+    track.style.scrollSnapType = 'none';
+  });
+  addEventListener('pointermove', (e) => {
+    if (!down) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 4) moved = true;
+    track.scrollLeft = startLeft - dx;
+  });
+  addEventListener('pointerup', () => {
+    if (!down) return;
+    down = false;
+    track.style.scrollSnapType = '';
+  });
+  track.addEventListener('click', (e) => moved && e.preventDefault(), true);
+  track.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // Видео играют, только когда видны
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((en) => {
+        const v = en.target as HTMLVideoElement;
+        if (en.isIntersecting && !reduce) v.play().catch(() => {});
+        else v.pause();
+      }),
+    { threshold: 0.4 },
+  );
+  document.querySelectorAll<HTMLVideoElement>('.story-video').forEach((v) => io.observe(v));
+</script>

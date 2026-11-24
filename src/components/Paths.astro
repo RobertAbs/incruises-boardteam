@@ -1,0 +1,96 @@
+---
+import Icon from './art/Icon.astro';
+import { whyMember, whyPartner } from '../data/content';
+
+const paths = [
+  {
+    n: '01',
+    title: 'Член клуба',
+    sub: 'путешествия',
+    q: 'Зачем стать членом клуба inCruises?',
+    items: whyMember,
+    dark: false,
+  },
+  {
+    n: '02',
+    title: 'Член-партнёр клуба',
+    sub: 'путешествия + бизнес',
+    q: 'Зачем стать партнёром inCruises?',
+    items: whyPartner,
+    dark: true,
+  },
+];
+---
+
+<section id="paths" class="relative bg-paper py-[clamp(72px,10vw,140px)]">
+  <div class="container-x">
+    <div class="mb-12 max-w-[760px] md:mb-16">
+      <p class="eyebrow mb-5 bg-ocean/10 text-ocean" data-reveal>Два пути</p>
+      <h2 class="h-section" data-split>Выберите свой формат в&nbsp;клубе</h2>
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-2">
+      {
+        paths.map((p) => (
+          <article
+            class:list={[
+              'path-card group relative overflow-hidden rounded-5xl p-7 sm:p-10',
+              p.dark ? 'bg-ink text-white' : 'card',
+            ]}
+            data-reveal
+          >
+            <div
+              class:list={[
+                'pointer-events-none absolute -top-32 -right-32 h-80 w-80 rounded-full blur-3xl transition-transform duration-1000 group-hover:scale-125',
+                p.dark ? 'bg-brand/30' : 'bg-sea/20',
+              ]}
+            />
+            <div class="relative">
+              <div class="flex items-start justify-between gap-4">
+                <span class:list={['num text-[5rem] leading-none sm:text-[7rem]', p.dark ? 'text-gradient-brand' : 'text-gradient-sea']}>{p.n}</span>
+                <span class:list={['eyebrow mt-4', p.dark ? 'bg-brand text-white' : 'bg-ocean text-white']}>{p.sub}</span>
+              </div>
+              <h3 class="mt-6 font-display text-3xl font-bold sm:text-4xl">{p.title}</h3>
+              <p class:list={['mt-2 font-semibold', p.dark ? 'text-white/60' : 'text-muted']}>{p.q}</p>
+
+              <ul class="mt-8 space-y-4">
+                {p.items.map((t) => (
+                  <li class="check-item flex items-start gap-4">
+                    <span
+                      class:list={[
+                        'mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full',
+                        p.dark ? 'bg-brand text-white' : 'bg-ocean text-white',
+                      ]}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path class="check-path" d="M5 12.5l4.5 4.5L19 7.5" />
+                      </svg>
+                    </span>
+                    <span class="pt-1 text-[17px] leading-snug font-semibold">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../scripts/motion';
+  if (!reduce) {
+    document.querySelectorAll<HTMLElement>('.path-card').forEach((card) => {
+      const items = card.querySelectorAll('.check-item');
+      const paths = card.querySelectorAll('.check-path');
+      const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 75%', once: true } });
+      tl.from(items, { x: -20, opacity: 0, duration: 0.7, ease: 'expo.out', stagger: 0.12 }).fromTo(
+        paths,
+        { drawSVG: '0%' },
+        { drawSVG: '100%', duration: 0.5, ease: 'power2.out', stagger: 0.12 },
+        0.2,
+      );
+    });
+  }
+</script>

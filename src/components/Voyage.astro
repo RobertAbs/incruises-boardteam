@@ -1,0 +1,189 @@
+---
+import Plane from './art/Plane.astro';
+
+const home = { x: 1010, y: 150, name: 'Астана' };
+const ports = [
+  { x: 330, y: 300, name: 'Барселона', dx: -18, dy: 32 },
+  { x: 410, y: 262, name: 'Марсель', dx: 0, dy: -18 },
+  { x: 480, y: 250, name: 'Генуя', dx: 6, dy: -18 },
+  { x: 540, y: 315, name: 'Рим', dx: 6, dy: 32 },
+  { x: 690, y: 370, name: 'Санторини', dx: 0, dy: 34 },
+  { x: 760, y: 280, name: 'Стамбул', dx: 10, dy: -18 },
+];
+const flight = `M${home.x} ${home.y} C 860 20, 480 60, ${ports[0].x} ${ports[0].y}`;
+const sea = `M${ports[0].x} ${ports[0].y} C 360 280, 380 266, ${ports[1].x} ${ports[1].y} S 460 240, ${ports[2].x} ${ports[2].y} S 500 300, ${ports[3].x} ${ports[3].y} S 620 390, ${ports[4].x} ${ports[4].y} S 740 330, ${ports[5].x} ${ports[5].y}`;
+
+// Точечная «карта мира»: псевдо-континенты из точек
+const dots: { x: number; y: number }[] = [];
+const blobs = [
+  { cx: 420, cy: 200, rx: 220, ry: 110 },
+  { cx: 900, cy: 190, rx: 300, ry: 130 },
+  { cx: 520, cy: 470, rx: 130, ry: 120 },
+  { cx: 1050, cy: 420, rx: 90, ry: 60 },
+  { cx: 150, cy: 230, rx: 120, ry: 150 },
+];
+for (let x = 10; x < 1200; x += 16)
+  for (let y = 10; y < 600; y += 16) {
+    const inside = blobs.some((b) => ((x - b.cx) / b.rx) ** 2 + ((y - b.cy) / b.ry) ** 2 < 1);
+    const sea = ((x - 520) / 260) ** 2 + ((y - 320) / 70) ** 2 < 1;
+    if (inside && !sea) dots.push({ x, y });
+  }
+---
+
+<section id="voyage" class="relative bg-navy text-white">
+  <div id="voyage-pin" class="relative flex flex-col justify-center overflow-hidden py-20 md:min-h-[100svh]">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_40%_55%,#0f5fb5_0%,transparent_60%)] opacity-60"></div>
+
+    <div class="container-x relative">
+      <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div class="max-w-[640px]">
+          <p class="eyebrow mb-5 bg-white/10 text-aqua" data-reveal>Ваш маршрут</p>
+          <h2 class="h-section" data-split>Перелёт, лайнер и&nbsp;новые страны каждый день</h2>
+        </div>
+        <div class="flex gap-8" data-reveal>
+          <div>
+            <p class="text-xs font-bold tracking-wider text-white/50 uppercase">Портов</p>
+            <p class="num text-5xl text-brand"><span id="v-ports">6</span></p>
+          </div>
+          <div>
+            <p class="text-xs font-bold tracking-wider text-white/50 uppercase">Морских миль</p>
+            <p class="num text-5xl"><span id="v-miles">1 850</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative mt-8 overflow-hidden md:overflow-visible">
+        <svg id="voyage-map" viewBox="0 0 1200 560" class="-ml-[40%] h-auto w-[165%] max-w-none md:ml-0 md:w-full" role="img" aria-label="Маршрут: перелёт из Астаны в Барселону и круиз по Средиземному морю до Стамбула">
+          <g fill="#6fd8ff" opacity=".22">
+            {dots.map((d) => <circle cx={d.x} cy={d.y} r="2.2" />)}
+          </g>
+
+          <!-- Перелёт -->
+          <path d={flight} fill="none" stroke="white" stroke-opacity=".18" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"></path>
+          <path id="v-flight" d={flight} fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"></path>
+
+          <!-- Морской путь -->
+          <path d={sea} fill="none" stroke="#6fd8ff" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"></path>
+          <path id="v-sea" d={sea} fill="none" stroke="#f7941d" stroke-width="4" stroke-linecap="round"></path>
+
+          <!-- Дом -->
+          <g>
+            <circle cx={home.x} cy={home.y} r="16" fill="#6fd8ff" opacity=".18"></circle>
+            <circle cx={home.x} cy={home.y} r="6" fill="#6fd8ff"></circle>
+            <text x={home.x + 16} y={home.y - 14} fill="white" font-size="18" font-weight="700" font-family="Manrope Variable, sans-serif">{home.name}</text>
+          </g>
+
+          <!-- Порты -->
+          {
+            ports.map((p, i) => (
+              <g class="v-port" data-i={i} opacity=".35">
+                <circle class="v-ring" cx={p.x} cy={p.y} r="14" fill="#f7941d" opacity="0" />
+                <circle cx={p.x} cy={p.y} r="6.5" fill="white" stroke="#f7941d" stroke-width="3" />
+                <text x={p.x + p.dx} y={p.y + p.dy} text-anchor="middle" fill="white" font-size="16" font-weight="700" font-family="Manrope Variable, sans-serif">
+                  {p.name}
+                </text>
+              </g>
+            ))
+          }
+
+          <!-- Самолёт -->
+          <Plane id="v-plane" scale={0.6} />
+
+          <!-- Кораблик -->
+          <g id="v-ship" opacity="0">
+            <g transform="translate(-22 -16)">
+              <path d="M2 18h40l-6 10H8z" fill="#ffffff"></path>
+              <path d="M5 24h34l-3 4H8z" fill="#0a2244"></path>
+              <rect x="10" y="11" width="24" height="7" rx="1.5" fill="#ffffff"></rect>
+              <rect x="15" y="5" width="13" height="6" rx="1.5" fill="#ffffff"></rect>
+              <rect x="22" y="0" width="6" height="6" fill="#f7941d"></rect>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, reduce, makeFlow } from '../scripts/motion';
+
+  const portsEl = document.getElementById('v-ports')!;
+  const milesEl = document.getElementById('v-miles')!;
+  const portsFlow = makeFlow(portsEl);
+  const milesFlow = makeFlow(milesEl);
+  const ports = gsap.utils.toArray<SVGGElement>('.v-port');
+
+  let shown = -1;
+  const setPorts = (n: number) => {
+    if (n === shown) return;
+    shown = n;
+    portsFlow.update(Math.max(0, n));
+    milesFlow.update(Math.round((Math.max(0, n) / ports.length) * 1850));
+    ports.forEach((p, i) => {
+      const on = i < n;
+      gsap.to(p, { opacity: on ? 1 : 0.35, duration: 0.4 });
+      if (on && !p.dataset.done) {
+        p.dataset.done = '1';
+        gsap.fromTo(p.querySelector('.v-ring'), { attr: { r: 6 }, opacity: 0.9 }, { attr: { r: 30 }, opacity: 0, duration: 1.2, ease: 'expo.out' });
+      }
+      if (!on) delete p.dataset.done;
+    });
+  };
+
+  if (reduce) {
+    setPorts(ports.length);
+    gsap.set('#v-plane', { opacity: 0 });
+    gsap.set('#v-ship', { opacity: 1 });
+  } else {
+    portsFlow.animated = false;
+    milesFlow.animated = false;
+    setPorts(0);
+    requestAnimationFrame(() => {
+      portsFlow.animated = true;
+      milesFlow.animated = true;
+    });
+
+    gsap.set(['#v-flight', '#v-sea'], { drawSVG: '0%' });
+    const seaPath = document.getElementById('v-sea') as unknown as SVGPathElement;
+    const total = seaPath.getTotalLength();
+    // Доли пути, на которых корабль проходит порты
+    const marks = ports.map((p) => {
+      const c = p.querySelector('circle:nth-of-type(2)') as SVGCircleElement;
+      const px = Number(c.getAttribute('cx'));
+      const py = Number(c.getAttribute('cy'));
+      let best = 0;
+      let bestD = Infinity;
+      for (let l = 0; l <= total; l += 4) {
+        const pt = seaPath.getPointAtLength(l);
+        const d = (pt.x - px) ** 2 + (pt.y - py) ** 2;
+        if (d < bestD) {
+          bestD = d;
+          best = l / total;
+        }
+      }
+      return best;
+    });
+
+    gsap.set('#v-plane', { motionPath: { path: '#v-flight', align: '#v-flight', alignOrigin: [0.5, 0.5], autoRotate: true, end: 0 } });
+    gsap.set('#v-ship', { motionPath: { path: '#v-sea', align: '#v-sea', alignOrigin: [0.5, 0.5], end: 0 } });
+    const prog = { sea: 0 };
+    const tl = gsap.timeline({ defaults: { ease: 'none' } });
+    tl.to('#v-flight', { drawSVG: '100%', duration: 1 }, 0)
+      .fromTo('#v-plane', { opacity: 1 }, { motionPath: { path: '#v-flight', align: '#v-flight', alignOrigin: [0.5, 0.5], autoRotate: true }, duration: 1 }, 0)
+      .to('#v-plane', { opacity: 0, scale: 0.3, duration: 0.15 }, 1)
+      .to('#v-ship', { opacity: 1, duration: 0.1 }, 1)
+      .to('#v-sea', { drawSVG: '100%', duration: 2 }, 1.05)
+      .to('#v-ship', { motionPath: { path: '#v-sea', align: '#v-sea', alignOrigin: [0.5, 0.5], autoRotate: false }, duration: 2 }, 1.05)
+      .to(prog, { sea: 1, duration: 2, onUpdate: () => setPorts(marks.filter((m) => prog.sea >= m - 0.005).length) }, 1.05);
+
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 768px)', () => {
+      ScrollTrigger.create({ animation: tl, trigger: '#voyage-pin', start: 'top top', end: '+=1600', pin: true, scrub: 0.8 });
+    });
+    mm.add('(max-width: 767px)', () => {
+      tl.pause(0);
+      ScrollTrigger.create({ trigger: '#voyage-map', start: 'top 70%', once: true, onEnter: () => gsap.to(tl, { progress: 1, duration: 7, ease: 'power1.inOut' }) });
+    });
+  }
+</script>

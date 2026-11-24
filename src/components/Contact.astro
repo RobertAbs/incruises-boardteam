@@ -1,0 +1,107 @@
+---
+import Icon from './art/Icon.astro';
+import Ship from './art/Ship.astro';
+import { site } from '../config';
+
+const c = site.contacts;
+const direct = [
+  c.whatsapp && { href: `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(site.whatsappText)}`, label: 'WhatsApp', icon: 'whatsapp' },
+  c.telegram && { href: `https://t.me/${c.telegram}`, label: 'Telegram', icon: 'telegram' },
+  c.instagram && { href: `https://instagram.com/${c.instagram}`, label: 'Instagram', icon: 'instagram' },
+].filter(Boolean) as { href: string; label: string; icon: string }[];
+const interests = ['Первый круиз', 'Членство в клубе', 'Партнёрство и доход', 'Отели и туры'];
+---
+
+<section id="contact" class="relative overflow-hidden bg-[linear-gradient(180deg,#f5f8fc_0%,#e3f2fd_100%)] py-[clamp(72px,10vw,140px)]">
+  <!-- Корабль на горизонте -->
+  <div class="pointer-events-none absolute right-[-10%] bottom-10 w-[min(70vw,560px)] opacity-[0.07]" aria-hidden="true" data-parallax="120">
+    <Ship id="contact-ship" class="w-full" />
+  </div>
+
+  <div class="container-x relative">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+      <div>
+        <p class="eyebrow mb-5 bg-brand/10 text-brand-600" data-reveal>Ваше следующее путешествие</p>
+        <h2 class="h-section" data-split>Начнём с&nbsp;разговора</h2>
+        <p class="lead mt-6 max-w-[520px] text-muted" data-reveal>
+          Расскажите, какой отдых вам нравится. Подберём план членства, ответим на&nbsp;вопросы о&nbsp;клубе и&nbsp;партнёрстве — без обязательств.
+        </p>
+        {
+          direct.length > 0 && (
+            <div class="mt-8 flex flex-wrap gap-3" data-reveal>
+              {direct.map((d) => (
+                <a href={d.href} target="_blank" rel="noopener" class="btn-dark">
+                  <Icon name={d.icon} size={18} /> {d.label}
+                </a>
+              ))}
+            </div>
+          )
+        }
+        <ul class="mt-10 space-y-3 text-[15px] font-semibold text-ink/80" data-reveal>
+          <li class="flex items-center gap-3"><span class="text-brand"><Icon name="check" size={18} /></span> Ответим в течение дня</li>
+          <li class="flex items-center gap-3"><span class="text-brand"><Icon name="check" size={18} /></span> Поможем с регистрацией и первым бронированием</li>
+          <li class="flex items-center gap-3"><span class="text-brand"><Icon name="check" size={18} /></span> Поддержка команды BoardTeam</li>
+        </ul>
+      </div>
+
+      <form id="lead-form" class="card relative p-6 sm:p-9" data-reveal novalidate>
+        <label class="block">
+          <span class="text-sm font-bold">Как к вам обращаться?</span>
+          <input name="name" required autocomplete="given-name" class="mt-2 w-full rounded-2xl border border-ink/10 bg-paper px-4 py-3.5 font-semibold outline-none transition focus:border-brand focus:bg-white" placeholder="Ваше имя" />
+        </label>
+
+        <fieldset class="mt-6">
+          <legend class="text-sm font-bold">Что вас интересует?</legend>
+          <div class="mt-3 flex flex-wrap gap-2">
+            {
+              interests.map((t, i) => (
+                <label class="cursor-pointer">
+                  <input type="checkbox" name="interest" value={t} class="peer sr-only" checked={i === 0} />
+                  <span class="inline-block rounded-full border border-ink/10 px-4 py-2.5 text-sm font-bold transition peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand hover:border-brand/50">
+                    {t}
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <label class="mt-6 block">
+          <span class="text-sm font-bold">Пожелания к путешествию</span>
+          <textarea name="wish" rows="3" class="mt-2 w-full resize-none rounded-2xl border border-ink/10 bg-paper px-4 py-3.5 font-semibold outline-none transition focus:border-brand focus:bg-white" placeholder="Куда хотите поехать, когда, сколько человек…"></textarea>
+        </label>
+
+        <button type="submit" class="btn-brand mt-7 w-full !py-4 text-base">
+          <Icon name="whatsapp" size={20} /> Отправить в WhatsApp
+        </button>
+        <p class="mt-3 text-center text-xs text-muted">Сообщение откроется в мессенджере — вы сможете проверить его перед отправкой.</p>
+        <p id="lead-error" class="mt-3 hidden text-center text-sm font-bold text-[#e0174f]" role="alert"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ contacts: site.contacts }}>
+  const form = document.getElementById('lead-form');
+  const err = document.getElementById('lead-error');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const name = String(fd.get('name') || '').trim();
+    if (!name) {
+      err.textContent = 'Пожалуйста, укажите имя';
+      err.classList.remove('hidden');
+      form.querySelector('[name=name]').focus();
+      return;
+    }
+    err.classList.add('hidden');
+    const interests = fd.getAll('interest').join(', ');
+    const wish = String(fd.get('wish') || '').trim();
+    const text = [`Здравствуйте! Меня зовут ${name}.`, interests && `Интересует: ${interests}.`, wish && `Пожелания: ${wish}`].filter(Boolean).join('\n');
+    let url;
+    if (contacts.whatsapp) url = `https://wa.me/${contacts.whatsapp}?text=${encodeURIComponent(text)}`;
+    else if (contacts.telegram) url = `https://t.me/${contacts.telegram}`;
+    else url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>

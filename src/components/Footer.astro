@@ -1,0 +1,33 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/incruises-logo.png';
+import boardteam from '../assets/brand/boardteam.png';
+import { nav, site } from '../config';
+import { disclaimer } from '../data/content';
+const year = new Date().getFullYear();
+---
+
+<footer class="relative bg-ink pt-16 pb-10 text-white">
+  <div class="container-x">
+    <div class="flex flex-col justify-between gap-10 border-b border-white/10 pb-10 md:flex-row md:items-center">
+      <div class="flex items-center gap-4">
+        <span class="grid h-12 place-items-center rounded-2xl bg-white px-3">
+          <Image src={logo} alt="inCruises Independent Partner" class="h-7 w-auto" width={200} />
+        </span>
+        <Image src={boardteam} alt="BoardTeam International team" class="h-9 w-auto" width={220} />
+      </div>
+      <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Разделы в подвале">
+        {nav.map((n) => <a href={n.href} class="text-sm font-semibold text-white/70 transition hover:text-white">{n.label}</a>)}
+      </nav>
+    </div>
+
+    <p class="mt-8 max-w-[900px] text-xs leading-relaxed text-white/45">
+      <span class="font-bold text-aqua">Важная информация:</span>
+      {disclaimer}
+    </p>
+    <div class="mt-8 flex flex-col justify-between gap-3 text-xs text-white/40 sm:flex-row">
+      <p>© {year} {site.team} · Независимый партнёр inCruises</p>
+      <p>inCruises® является зарегистрированным товарным знаком inGroup International</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,109 @@
+---
+import Icon from './art/Icon.astro';
+import { platform } from '../data/content';
+const fmt = (n: number) => n.toLocaleString('ru-RU');
+---
+
+<section id="platform" class="relative overflow-hidden bg-[linear-gradient(180deg,#0a2244_0%,#0d3466_55%,#0f5fb5_100%)] py-[clamp(72px,10vw,140px)] text-white">
+  <!-- Фоновые линии-волны -->
+  <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12]" preserveAspectRatio="none" viewBox="0 0 1200 800" aria-hidden="true">
+    {
+      Array.from({ length: 14 }, (_, i) => (
+        <path d={`M0 ${120 + i * 48} C 300 ${60 + i * 48}, 600 ${200 + i * 48}, 1200 ${100 + i * 48}`} fill="none" stroke="#6fd8ff" stroke-width="1" />
+      ))
+    }
+  </svg>
+
+  <div class="container-x relative">
+    <div class="mx-auto mb-14 max-w-[820px] text-center md:mb-20">
+      <p class="eyebrow mb-5 bg-white/10 text-aqua" data-reveal><Icon name="search" size={14} /> inCruises · inStays · inTours</p>
+      <h2 class="h-section" data-split>Собственная платформа бронирования</h2>
+      <p class="lead mx-auto mt-5 max-w-[600px] text-white/70" data-reveal>
+        Круизы, отели и&nbsp;туры — в&nbsp;одном приложении. Все налоги, сборы и&nbsp;чаевые включены, никаких скрытых расходов.
+      </p>
+    </div>
+
+    <div id="phones" class="-mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 [scrollbar-width:none] lg:mx-0 lg:justify-center lg:gap-12 lg:overflow-visible lg:px-0 lg:pb-0">
+      {
+        platform.map((p, i) => (
+          <div class="phone relative w-[280px] shrink-0 snap-center sm:w-[300px]" data-index={i}>
+            <div class="rounded-[2.8rem] bg-[#0b0f17] p-2.5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)] ring-1 ring-white/20">
+              <div class="relative overflow-hidden rounded-[2.3rem] bg-[#f3f5f9] text-ink">
+                <!-- Статус-бар и «чёлка» -->
+                <div class="absolute top-2 left-1/2 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-[#0b0f17]" />
+                <div class="relative px-5 pt-12 pb-6 text-white" style={`background: linear-gradient(160deg, ${p.color}, #06152b)`}>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-2 text-sm font-bold">
+                      <span class="rounded-md bg-brand px-1.5 py-0.5 font-serif text-xs italic">in</span>
+                      {p.brand}
+                    </span>
+                    <span class="text-xs font-semibold opacity-70">{p.tab}</span>
+                  </div>
+                  <p class="mt-5 text-sm leading-snug font-semibold opacity-90">
+                    {p.pre && <span>{p.pre} </span>}
+                    <span class="num block text-4xl leading-tight" data-count={p.value} data-delay={i * 150}>
+                      {fmt(p.value)}
+                    </span>
+                    {p.headline}
+                  </p>
+                </div>
+                <div class="space-y-3 px-4 pt-5 pb-6">
+                  {p.fields.map((f) => (
+                    <div class="rounded-2xl bg-white px-4 py-3 shadow-[0_1px_0_rgba(6,21,43,0.05)]">
+                      <p class="text-[10px] font-bold tracking-wider text-muted uppercase">{f.label}</p>
+                      <p class="typed mt-0.5 min-h-[1.4em] text-sm font-bold" data-text={f.value}>
+                        {f.value}
+                      </p>
+                    </div>
+                  ))}
+                  <div class="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-brand py-3.5 text-sm font-bold text-white">
+                    <Icon name="search" size={16} /> Найти
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, reduce, isDesktop } from '../scripts/motion';
+
+  // Печатающийся текст в полях поиска
+  const typeIn = (phone: Element) => {
+    phone.querySelectorAll<HTMLElement>('.typed').forEach((el, j) => {
+      const text = el.dataset.text ?? '';
+      el.textContent = '';
+      let k = 0;
+      setTimeout(() => {
+        const id = setInterval(() => {
+          el.textContent = text.slice(0, ++k);
+          if (k >= text.length) clearInterval(id);
+        }, 45);
+      }, 400 + j * 700);
+    });
+  };
+
+  const phones = gsap.utils.toArray<HTMLElement>('.phone');
+  phones.forEach((ph) => ScrollTrigger.create({ trigger: ph, start: 'top 80%', once: true, onEnter: () => !reduce && typeIn(ph) }));
+
+  if (!reduce) {
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1024px)', () => {
+      // Телефоны раскрываются веером
+      const [a, b, c] = phones;
+      const tl = gsap.timeline({ scrollTrigger: { trigger: '#phones', start: 'top 85%', end: 'center 45%', scrub: 0.8 } });
+      tl.fromTo(a, { x: 320, rotate: 0, y: 60 }, { x: 0, rotate: -7, y: 40, ease: 'none' }, 0)
+        .fromTo(b, { y: 120, scale: 0.92 }, { y: -10, scale: 1, ease: 'none' }, 0)
+        .fromTo(c, { x: -320, rotate: 0, y: 60 }, { x: 0, rotate: 7, y: 40, ease: 'none' }, 0);
+      gsap.set(b, { zIndex: 2 });
+    });
+    mm.add('(max-width: 1023px)', () => {
+      gsap.from(phones, { y: 60, opacity: 0, stagger: 0.12, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: '#phones', start: 'top 85%', once: true } });
+    });
+  }
+  void isDesktop;
+</script>
