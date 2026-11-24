@@ -1,0 +1,312 @@
+---
+import Icon from '../art/Icon.astro';
+import { questions, planInfo } from '../../data/quiz';
+import { plans, earnings } from '../../data/content';
+import { site } from '../../config';
+
+const total = questions.length;
+---
+
+<section id="quiz" class="relative scroll-mt-4 bg-[#f4f6fa] py-[clamp(64px,9vw,120px)] text-[#071526]">
+  <div class="mx-auto max-w-[760px] px-4 sm:px-6">
+    <div class="mb-8 text-center sm:mb-10">
+      <p class="text-sm font-bold tracking-wide text-brand-600">Подбор плана · 1 минута</p>
+      <h2 class="mt-3 text-[clamp(2rem,4.6vw,3.2rem)] leading-[1.05] font-extrabold tracking-[-0.04em] text-balance" data-split>Найдём ваш формат путешествий</h2>
+    </div>
+
+    <div id="quiz-card" class="relative overflow-hidden rounded-[32px] bg-white p-5 shadow-[0_1px_0_rgba(7,21,38,0.04),0_30px_80px_-40px_rgba(7,21,38,0.35)] sm:p-9" data-reveal>
+      <!-- Прогресс -->
+      <div id="quiz-head" class="flex items-center justify-between gap-4">
+        <button id="quiz-back" class="grid h-10 w-10 place-items-center rounded-full text-[#071526]/60 transition hover:bg-[#071526]/5 disabled:opacity-0" aria-label="Назад" disabled>
+          <Icon name="back" size={20} />
+        </button>
+        <div class="flex-1">
+          <div class="h-1.5 overflow-hidden rounded-full bg-[#071526]/8">
+            <div id="quiz-bar" class="h-full rounded-full bg-gradient-to-r from-brand to-[#ff6a3d] transition-[width] duration-700 ease-(--ease-out-expo)" style={`width:${100 / total}%`}></div>
+          </div>
+        </div>
+        <span id="quiz-count" class="min-w-14 whitespace-nowrap text-right text-sm font-bold text-[#071526]/50 tabular-nums">1 / {total}</span>
+      </div>
+
+      <!-- Шаги -->
+      <div id="quiz-stage" class="relative mt-7">
+        {
+          questions.map((q, i) => (
+            <fieldset class:list={['quiz-step', i > 0 && 'hidden']} data-step={i} data-q={q.id} data-multi={q.multi ? '1' : undefined}>
+              <legend class="text-[clamp(1.5rem,3.4vw,2rem)] leading-tight font-extrabold tracking-[-0.03em]">{q.title}</legend>
+              {q.sub && <p class="mt-1.5 text-[15px] font-medium text-[#071526]/55">{q.sub}</p>}
+              <div class:list={['mt-6 grid gap-2.5', q.options.length > 3 ? 'sm:grid-cols-2' : '']}>
+                {q.options.map((o) => (
+                  <button
+                    type="button"
+                    class="quiz-opt group flex items-center gap-4 rounded-2xl border-2 border-[#071526]/8 bg-white px-4 py-4 text-left transition-[border-color,background-color,transform] duration-300 hover:border-brand/50 active:scale-[0.99] aria-pressed:border-brand aria-pressed:bg-brand/[0.06]"
+                    data-value={o.id}
+                    aria-pressed="false"
+                  >
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#071526]/5 text-[#071526]/70 transition group-aria-pressed:bg-brand group-aria-pressed:text-white">
+                      <Icon name={o.icon} size={22} />
+                    </span>
+                    <span class="flex-1">
+                      <span class="block text-[16px] leading-snug font-bold">{o.label}</span>
+                      {o.hint && <span class="mt-0.5 block text-[13px] font-medium text-[#071526]/55">{o.hint}</span>}
+                    </span>
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-[#071526]/15 text-white transition group-aria-pressed:border-brand group-aria-pressed:bg-brand">
+                      <Icon name="check" size={14} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {q.multi && (
+                <button type="button" class="quiz-next v3-btn mt-6 w-full bg-[#071526] text-white disabled:opacity-30" disabled>
+                  Показать мой план <Icon name="arrow" size={18} />
+                </button>
+              )}
+            </fieldset>
+          ))
+        }
+
+        <!-- Результат -->
+        <div id="quiz-result" class="hidden" aria-live="polite">
+          <div class="flex items-center gap-4">
+            <span id="r-coin" class="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#fff1b8] via-[#f3cf62] to-[#c9971f] text-3xl font-black text-[#5c4515] shadow-[inset_0_-4px_10px_rgba(0,0,0,0.15),0_12px_24px_-10px_rgba(0,0,0,0.4)]">C</span>
+            <div>
+              <p class="text-sm font-bold text-brand-600">Вам подходит</p>
+              <p class="text-[clamp(1.8rem,4vw,2.4rem)] leading-none font-extrabold tracking-[-0.04em]">План <span id="r-name">Classic</span></p>
+            </div>
+          </div>
+          <p id="r-tagline" class="mt-4 text-[17px] leading-relaxed font-medium text-[#071526]/75"></p>
+          <p class="mt-1 text-sm font-semibold text-[#071526]/50">Членство: <span id="r-from"></span></p>
+
+          <!-- Пример выгоды (Classic / Premium) -->
+          <div id="r-calc" class="mt-6 rounded-3xl bg-[#071526] p-5 text-white sm:p-6">
+            <p class="text-sm font-semibold text-white/60">Пример из презентации: <span id="r-example"></span></p>
+            <div class="mt-4 grid grid-cols-3 gap-3">
+              <div>
+                <p class="text-xs font-semibold text-white/50">Стоимость</p>
+                <p class="mt-1 text-xl font-extrabold tracking-tight sm:text-2xl"><span id="r-cruise" data-suffix=" $">0 $</span></p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-white/50">Из своих средств</p>
+                <p class="mt-1 text-xl font-extrabold tracking-tight sm:text-2xl"><span id="r-own" data-suffix=" $">0 $</span></p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-brand">Выгода</p>
+                <p class="mt-1 text-xl font-extrabold tracking-tight text-brand sm:text-2xl"><span id="r-benefit" data-suffix=" $">0 $</span></p>
+              </div>
+            </div>
+            <div class="mt-5 flex h-3 overflow-hidden rounded-full bg-white/10">
+              <div id="r-bar" class="h-full rounded-full bg-gradient-to-r from-brand to-[#ff6a3d] transition-[width] duration-1000 ease-(--ease-out-expo)" style="width:0%"></div>
+            </div>
+            <p class="mt-2 text-xs font-medium text-white/50">Оранжевая часть оплачена бонусными баллами</p>
+          </div>
+
+          <!-- Для Starter -->
+          <ul id="r-starter" class="mt-6 hidden space-y-2.5">
+            {
+              ['Копите бонусные баллы с первого месяца', 'Активные члены клуба получают моментальную экономию до 17% по Insider цене', 'Все налоги, сборы и чаевые включены в цену'].map((t) => (
+                <li class="flex items-start gap-3 rounded-2xl bg-[#f4f6fa] px-4 py-3 text-[15px] font-semibold">
+                  <span class="mt-0.5 text-brand"><Icon name="check" size={18} /></span>
+                  {t}
+                </li>
+              ))
+            }
+          </ul>
+
+          <!-- Партнёрство -->
+          <div id="r-partner" class="mt-4 hidden rounded-3xl border-2 border-brand/30 bg-brand/[0.05] p-5">
+            <p class="text-lg font-extrabold tracking-tight">+ Партнёрство за&nbsp;$95</p>
+            <p class="mt-1 text-[15px] font-medium text-[#071526]/70">
+              Добавьте к&nbsp;плану и&nbsp;получайте доход в&nbsp;долларах: {earnings.slice(0, 3).join(', ').toLowerCase()}. Оплачивается раз в&nbsp;6&nbsp;месяцев.
+            </p>
+          </div>
+
+          <p id="r-where" class="mt-4 hidden text-[15px] font-medium text-[#071526]/70"></p>
+
+          <!-- Контакт -->
+          <form id="r-form" class="mt-7 border-t border-[#071526]/8 pt-6" novalidate>
+            <label class="block text-sm font-bold" for="r-name-input">Как к вам обращаться?</label>
+            <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+              <input id="r-name-input" name="name" autocomplete="given-name" placeholder="Ваше имя" class="h-14 flex-1 rounded-2xl border-2 border-[#071526]/10 bg-[#f4f6fa] px-4 text-[16px] font-semibold outline-none transition focus:border-brand focus:bg-white" />
+              <button type="submit" class="v3-btn h-14 bg-[#25d366] text-white hover:bg-[#1fb857]">
+                <Icon name="whatsapp" size={20} /> Получить подборку
+              </button>
+            </div>
+            <p id="r-error" class="mt-2 hidden text-sm font-bold text-[#e0174f]" role="alert"></p>
+            <p class="mt-3 text-xs font-medium text-[#071526]/50">Откроется WhatsApp с готовым сообщением — вы сможете проверить его перед отправкой.</p>
+          </form>
+          <button id="quiz-restart" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#071526]/55 transition hover:text-[#071526]">
+            <Icon name="refresh" size={16} /> Пройти заново
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" id="quiz-data" set:html={JSON.stringify({ plans, planInfo, contacts: site.contacts })} />
+</section>
+
+<script>
+  import { gsap, reduce, makeFlow } from '../../scripts/motion';
+  import { pickPlan, whereLabels, questions, type Answers, type PlanId } from '../../data/quiz';
+  import type { Plan } from '../../data/content';
+
+  const data = JSON.parse(document.getElementById('quiz-data')!.textContent!) as {
+    plans: Plan[];
+    planInfo: Record<PlanId, { name: string; letter: string; tagline: string; from: string }>;
+    contacts: { whatsapp: string; telegram: string };
+  };
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const steps = [...document.querySelectorAll<HTMLElement>('.quiz-step')];
+  const result = $('quiz-result');
+  const bar = $('quiz-bar');
+  const count = $('quiz-count');
+  const back = $<HTMLButtonElement>('quiz-back');
+  const total = steps.length;
+  const answers: Answers = { where: [] };
+  let current = 0;
+  let plan: PlanId = 'classic';
+
+  const flows = {
+    cruise: makeFlow($('r-cruise')),
+    own: makeFlow($('r-own')),
+    benefit: makeFlow($('r-benefit')),
+  };
+
+  /** Плавная смена шага: текущий уходит влево, новый приходит справа */
+  const swap = (from: HTMLElement, to: HTMLElement, dir = 1) => {
+    if (reduce) {
+      from.classList.add('hidden');
+      to.classList.remove('hidden');
+      return;
+    }
+    gsap.to(from, {
+      x: -40 * dir,
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: () => {
+        from.classList.add('hidden');
+        gsap.set(from, { clearProps: 'all' });
+        to.classList.remove('hidden');
+        gsap.fromTo(to, { x: 40 * dir, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'expo.out' });
+        gsap.from(to.querySelectorAll('.quiz-opt'), { y: 14, opacity: 0, duration: 0.5, stagger: 0.05, ease: 'expo.out' });
+      },
+    });
+  };
+
+  const setProgress = (i: number) => {
+    const done = i >= total;
+    bar.style.width = `${done ? 100 : ((i + 1) / total) * 100}%`;
+    count.textContent = done ? 'Готово' : `${i + 1} / ${total}`;
+    back.disabled = i === 0;
+  };
+
+  const go = (i: number, dir = 1) => {
+    const from = current >= total ? result : steps[current];
+    const to = i >= total ? result : steps[i];
+    current = i;
+    setProgress(i);
+    swap(from, to, dir);
+    if (i >= total) showResult();
+    // На телефоне возвращаем верх карточки в поле зрения
+    const card = $('quiz-card');
+    if (card.getBoundingClientRect().top < 0) (window as any).__lenis?.scrollTo(card, { offset: -16 }) ?? card.scrollIntoView();
+  };
+
+  steps.forEach((step, i) => {
+    const multi = step.dataset.multi === '1';
+    const key = step.dataset.q as keyof Answers;
+    const next = step.querySelector<HTMLButtonElement>('.quiz-next');
+    step.querySelectorAll<HTMLButtonElement>('.quiz-opt').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.value!;
+        if (multi) {
+          const on = btn.getAttribute('aria-pressed') !== 'true';
+          btn.setAttribute('aria-pressed', String(on));
+          answers.where = on ? [...answers.where, val] : answers.where.filter((w) => w !== val);
+          if (next) next.disabled = answers.where.length === 0;
+        } else {
+          step.querySelectorAll('.quiz-opt').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          (answers as any)[key] = val;
+          setTimeout(() => go(i + 1), reduce ? 0 : 260);
+        }
+      }),
+    );
+    next?.addEventListener('click', () => go(i + 1));
+  });
+
+  back.addEventListener('click', () => current > 0 && go(current - 1, -1));
+  $('quiz-restart').addEventListener('click', () => {
+    answers.goal = answers.freq = answers.budget = undefined;
+    answers.where = [];
+    document.querySelectorAll('.quiz-opt').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    document.querySelectorAll<HTMLButtonElement>('.quiz-next').forEach((b) => (b.disabled = true));
+    go(0, -1);
+  });
+
+  function showResult() {
+    plan = pickPlan(answers);
+    const info = data.planInfo[plan];
+    $('r-name').textContent = info.name;
+    $('r-coin').textContent = info.letter;
+    $('r-tagline').textContent = info.tagline;
+    $('r-from').textContent = info.from;
+    const coin = $('r-coin');
+    const metal: Record<PlanId, string> = {
+      starter: 'from-[#ffffff] via-[#e6e9ee] to-[#9aa1ab] text-[#4b525c]',
+      classic: 'from-[#fff1b8] via-[#f3cf62] to-[#c9971f] text-[#5c4515]',
+      premium: 'from-[#6b707a] via-[#2b2e34] to-[#0c0d10] text-[#e6cf9b]',
+    };
+    coin.className = `grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br text-3xl font-black shadow-[inset_0_-4px_10px_rgba(0,0,0,0.15),0_12px_24px_-10px_rgba(0,0,0,0.4)] ${metal[plan]}`;
+
+    const p = data.plans.find((x) => x.id === plan);
+    $('r-calc').classList.toggle('hidden', !p);
+    $('r-starter').classList.toggle('hidden', !!p);
+    $('r-bar').style.width = '0%';
+    if (p) {
+      $('r-example').textContent = `круиз на двоих за ${p.cruise.toLocaleString('ru-RU')} $`;
+      flows.cruise.animated = flows.own.animated = flows.benefit.animated = false;
+      flows.cruise.update(0);
+      flows.own.update(0);
+      flows.benefit.update(0);
+      setTimeout(() => {
+        flows.cruise.animated = flows.own.animated = flows.benefit.animated = true;
+        flows.cruise.update(p.cruise);
+        flows.own.update(p.own);
+        flows.benefit.update(p.benefit);
+        $('r-bar').style.width = `${(p.bbTotal / p.cruise) * 100}%`;
+      }, 450);
+    }
+    $('r-partner').classList.toggle('hidden', answers.goal !== 'both');
+    const where = answers.where.filter((w) => w !== 'any').map((w) => whereLabels[w]);
+    const w = $('r-where');
+    w.classList.toggle('hidden', where.length === 0);
+    w.textContent = where.length ? `Подберём варианты: ${where.join(', ')}.` : '';
+  }
+
+  $('r-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = ($('r-name-input') as HTMLInputElement).value.trim();
+    const err = $('r-error');
+    if (!name) {
+      err.textContent = 'Пожалуйста, укажите имя';
+      err.classList.remove('hidden');
+      $('r-name-input').focus();
+      return;
+    }
+    err.classList.add('hidden');
+    const q = (id: string, v?: string) => questions.find((x) => x.id === id)!.options.find((o) => o.id === v)?.label ?? '—';
+    const lines = [
+      `Здравствуйте! Меня зовут ${name}.`,
+      `Прошёл(а) подбор плана на сайте — подходит план ${data.planInfo[plan].name}.`,
+      `Цель: ${q('goal', answers.goal)}`,
+      `Путешествую: ${q('freq', answers.freq)}`,
+      `Бюджет на двоих: ${q('budget', answers.budget)}`,
+      answers.where.length ? `Направления: ${answers.where.map((x) => whereLabels[x]).join(', ')}` : '',
+      'Расскажите, пожалуйста, подробнее.',
+    ].filter(Boolean);
+    const text = encodeURIComponent(lines.join('\n'));
+    const url = data.contacts.whatsapp ? `https://wa.me/${data.contacts.whatsapp}?text=${text}` : data.contacts.telegram ? `https://t.me/${data.contacts.telegram}` : `https://wa.me/?text=${text}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>

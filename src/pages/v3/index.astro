@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HeaderV3 from '../../components/v3/HeaderV3.astro';
+import HeroV3 from '../../components/v3/HeroV3.astro';
+import QuizV3 from '../../components/v3/QuizV3.astro';
+import HowV3 from '../../components/v3/HowV3.astro';
+import TeamV3 from '../../components/v3/TeamV3.astro';
+import FaqV3 from '../../components/v3/FaqV3.astro';
+import FinalV3 from '../../components/v3/FinalV3.astro';
+---
+
+<Layout
+  title="Подбор плана inCruises за 1 минуту — круизы на клубных условиях"
+  description="Ответьте на 4 вопроса — подберём план членства inCruises и посчитаем вашу выгоду на круизах. Команда BoardTeam."
+  bodyClass="v3 bg-white font-inter text-[#071526]"
+  themeColor="#071526"
+  ogImage="og-v3.jpg"
+>
+  <HeaderV3 />
+  <main id="main">
+    <HeroV3 />
+    <QuizV3 />
+    <HowV3 />
+    <TeamV3 />
+    <FaqV3 />
+  </main>
+  <FinalV3 />
+</Layout>

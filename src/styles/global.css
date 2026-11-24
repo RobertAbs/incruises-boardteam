@@ -163,6 +163,11 @@
   font-feature-settings: 'lnum';
 }
 
+/* ---------- Квиз (v3) ---------- */
+@utility v3-btn {
+  @apply inline-flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 text-[16px] font-bold tracking-[-0.01em] whitespace-nowrap transition-[transform,background-color,box-shadow] duration-300 active:scale-[0.98];
+}
+
 /* Градиентный текст внутри разбитых на слова заголовков */
 .text-gradient-brand .split-word > span {
   background: linear-gradient(100deg, #ffb347 0%, #f7941d 45%, #ff6a3d 100%);

@@ -1,0 +1,53 @@
+---
+import { Picture, Image } from 'astro:assets';
+import Icon from '../art/Icon.astro';
+import aerial from '../../assets/v2/ship-aerial.jpg';
+import logo from '../../assets/brand/incruises-logo.png';
+import { site, contactLink } from '../../config';
+import { disclaimer } from '../../data/content';
+const year = new Date().getFullYear();
+---
+
+<section class="relative isolate overflow-hidden bg-[#071526] py-[clamp(80px,11vw,150px)] text-white">
+  <div class="absolute inset-0 -z-10 opacity-60" data-zoom>
+    <Picture src={aerial} alt="" widths={[800, 1200]} sizes="100vw" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+  </div>
+  <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(7,21,38,0.6),rgba(7,21,38,0.9))]"></div>
+  <div class="mx-auto max-w-[760px] px-5 text-center sm:px-8">
+    <h2 class="text-[clamp(2.2rem,5.4vw,3.8rem)] leading-[1.03] font-extrabold tracking-[-0.045em] text-balance" data-split>Ваш первый клубный круиз ближе, чем кажется</h2>
+    <p class="mx-auto mt-5 max-w-[520px] text-[17px] font-medium text-white/75" data-reveal>Пройдите подбор плана или просто напишите — ответим на&nbsp;все вопросы.</p>
+    <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row" data-reveal>
+      <a href="#quiz" class="v3-btn bg-brand text-white hover:bg-brand-600">Подобрать план <Icon name="arrow" size={18} /></a>
+      <a href={contactLink()} class="v3-btn border border-white/30 bg-white/10 text-white backdrop-blur-md hover:bg-white/20"><Icon name="whatsapp" size={20} /> Написать нам</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-[#071526] pt-4 pb-28 text-white md:pb-10">
+  <div class="mx-auto max-w-[1240px] border-t border-white/10 px-5 pt-8 sm:px-8">
+    <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+      <span class="inline-grid h-10 w-fit place-items-center rounded-xl bg-white px-2.5">
+        <Image src={logo} alt="inCruises Independent Partner" class="h-6 w-auto" width={180} />
+      </span>
+      <p class="text-xs text-white/45">© {year} {site.team} · Независимый партнёр inCruises</p>
+    </div>
+    <p class="mt-6 max-w-[900px] text-xs leading-relaxed text-white/40">{disclaimer}</p>
+  </div>
+</footer>
+
+<!-- Липкая панель на телефоне -->
+<div id="v3-sticky" class="fixed inset-x-3 bottom-3 z-50 flex translate-y-[130%] gap-2 rounded-[22px] bg-[#071526]/90 p-2 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-500 ease-(--ease-out-expo) md:hidden" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))">
+  <a href="#quiz" class="v3-btn flex-1 bg-brand !py-3.5 text-[15px] text-white">Подобрать план</a>
+  <a href={contactLink()} class="v3-btn grid !h-auto w-14 place-items-center bg-[#25d366] !p-0 text-white" aria-label="Написать в WhatsApp"><Icon name="whatsapp" size={22} /></a>
+</div>
+
+<script>
+  const bar = document.getElementById('v3-sticky')!;
+  const quiz = document.getElementById('quiz')!;
+  const hero = document.getElementById('top')!;
+  let heroVisible = true;
+  let quizVisible = false;
+  const update = () => (bar.style.transform = !heroVisible && !quizVisible ? 'translateY(0)' : '');
+  new IntersectionObserver(([e]) => ((heroVisible = e.isIntersecting), update()), { threshold: 0.15 }).observe(hero);
+  new IntersectionObserver(([e]) => ((quizVisible = e.isIntersecting), update()), { threshold: 0.2 }).observe(quiz);
+</script>

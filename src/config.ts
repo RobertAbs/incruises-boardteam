@@ -23,6 +23,18 @@ export const site = {
     joinUrl: 'https://www.incruises.com/',
   },
   whatsappText: 'Здравствуйте! Хочу узнать подробнее о клубе inCruises.',
+
+  /**
+   * Личный консультант (используется в версии 3).
+   * Пока name пустое, вместо личной карточки показывается блок команды BoardTeam.
+   * photo — путь к файлу в папке public, например 'owner.jpg'
+   */
+  owner: {
+    name: '',
+    role: 'Независимый партнёр inCruises',
+    photo: '',
+    story: '',
+  },
 };
 
 export const nav = [

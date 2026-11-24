@@ -11,6 +11,7 @@
 | --- | --- | --- | --- |
 | 1 — яркая, иллюстрированная | `/` | `src/pages/index.astro` | `src/components/*.astro` |
 | 2 — VIP, фотографии, тёмный «оникс» и золото | `/v2/` | `src/pages/v2/index.astro` | `src/components/v2/*.astro` |
+| 3 — квиз-воронка для телефона, видео на первом экране | `/v3/` | `src/pages/v3/index.astro` | `src/components/v3/*.astro` |
 
 Тексты, цифры, контакты и логика (калькулятор, счётчики, маршрут, форма) у версий общие — правка в `src/data/content.ts` или `src/config.ts` меняет обе.
 Чтобы сделать вторую версию главной, поменяйте местами содержимое `src/pages/index.astro` и `src/pages/v2/index.astro` (пути импортов поправить на `../` / `../../`).
@@ -28,6 +29,9 @@
 | Фото и видео историй | `src/assets/stories/`, `src/assets/video/` и `src/components/Stories.astro` |
 | Картинка для превью ссылки в мессенджерах | `public/og.jpg` и `public/og-v2.jpg` (1200×630) |
 | Фото второй версии | `src/assets/v2/` |
+| Вопросы квиза и правила подбора плана (v3) | `src/data/quiz.ts` |
+| Имя, фото и история консультанта (v3) | `src/config.ts` → `owner` |
+| Видео первого экрана (v3) | `public/video/cruise-1080.mp4`, `cruise-720.mp4` — Pexels, видео №34917340 (Sergio Benitez), бесплатная лицензия Pexels |
 
 Контакты, которые оставлены пустыми, на сайте не показываются. Кнопка «Вступить в клуб» ведёт в WhatsApp, если номер указан.
 

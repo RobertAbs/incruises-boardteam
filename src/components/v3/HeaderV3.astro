@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/incruises-logo.png';
+import boardteam from '../../assets/brand/boardteam.png';
+---
+
+<header id="v3-header" class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-500">
+  <div class="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 sm:px-8">
+    <a href="#top" class="flex items-center gap-3" aria-label="inCruises — наверх">
+      <span class="grid h-10 place-items-center rounded-xl bg-white px-2.5 shadow-sm">
+        <Image src={logo} alt="inCruises Independent Partner" class="h-6 w-auto" width={180} />
+      </span>
+      <Image src={boardteam} alt="BoardTeam International team" class="v3-crest hidden h-7 w-auto sm:block" width={200} />
+    </a>
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Разделы">
+      {
+        [
+          ['#how', 'Как это работает'],
+          ['#team', 'Команда'],
+          ['#faq', 'Вопросы'],
+        ].map(([h, l]) => (
+          <a href={h} class="v3-nav rounded-full px-4 py-2 text-sm font-semibold text-white/85 transition hover:bg-white/10">
+            {l}
+          </a>
+        ))
+      }
+    </nav>
+    <a href="#quiz" class="v3-btn bg-brand !px-5 !py-3 text-sm text-white hover:bg-brand-600">Подобрать план</a>
+  </div>
+</header>
+
+<script>
+  const h = document.getElementById('v3-header')!;
+  const crest = h.querySelector<HTMLElement>('.v3-crest');
+  const links = h.querySelectorAll<HTMLElement>('.v3-nav');
+  const onScroll = () => {
+    const solid = scrollY > innerHeight * 0.7;
+    h.classList.toggle('bg-white/90', solid);
+    h.classList.toggle('backdrop-blur-xl', solid);
+    h.classList.toggle('shadow-[0_1px_0_rgba(7,21,38,0.08)]', solid);
+    links.forEach((l) => {
+      l.classList.toggle('!text-[#071526]', solid);
+      l.classList.toggle('hover:!bg-[#071526]/5', solid);
+    });
+    if (crest) crest.style.filter = solid ? 'brightness(0) saturate(100%) invert(9%) sepia(30%) saturate(2000%) hue-rotate(190deg)' : '';
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
