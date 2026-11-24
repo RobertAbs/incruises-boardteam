@@ -1,0 +1,77 @@
+---
+import { Picture } from 'astro:assets';
+import porthole from '../../assets/v2/porthole.jpg';
+const payments = [1, 2, 3, 4, 5];
+---
+
+<section id="free" class="relative overflow-hidden bg-ivory py-[clamp(90px,12vw,180px)] text-onyx">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="grid items-center gap-16 lg:grid-cols-2 lg:gap-24">
+      <div>
+        <p class="v2-eyebrow mb-10 !text-[#9a7b3f]" data-reveal>Бесплатное членство</p>
+        <h2 class="v2-h" data-split>До&nbsp;<em class="text-[#9a7b3f] italic">50% экономии</em> на&nbsp;круизы</h2>
+        <p class="v2-lead mt-8 max-w-[520px] text-onyx/65" data-reveal>
+          Каждый раз, когда вы делаете <span class="text-onyx">$500 прямого оборота</span>, inCruises ежемесячно начисляет на&nbsp;ваш счёт
+          <span class="text-onyx">200 бонусных баллов</span>.
+        </p>
+
+        <div id="v2-free-demo" class="mt-12 border-t border-onyx/15" data-reveal>
+          <p class="pt-6 font-serif text-2xl italic">Пример: круиз 2&nbsp;000&nbsp;$ на&nbsp;двоих</p>
+          <ul class="mt-4">
+            {
+              payments.map((n) => (
+                <li class="v2-free-row flex items-center justify-between border-b border-onyx/10 py-3">
+                  <span class="relative font-inter text-sm text-onyx/55">
+                    {n}-й месяц · 100 $
+                    <span class="v2-strike absolute top-1/2 left-0 h-px w-full origin-left scale-x-0 bg-[#9a7b3f]" />
+                  </span>
+                  <span class="v2-free-bb font-serif text-lg text-[#9a7b3f] italic">200 ББ бесплатно</span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="mt-6 flex items-end justify-between">
+            <p class="font-inter text-[11px] tracking-[0.24em] text-onyx/55 uppercase">1 000 ББ + доплата</p>
+            <p class="v2-num text-5xl"><span id="v2-free-total" data-suffix=" $">1 000 $</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative mx-auto aspect-square w-full max-w-[560px]">
+        <div class="absolute inset-0 overflow-hidden rounded-full" data-mask>
+          <Picture src={porthole} alt="Вид на море через иллюминатор лайнера" widths={[560, 702]} sizes="(min-width:1024px) 40vw, 90vw" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+        </div>
+        <svg class="v2-ring-text pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)]" viewBox="0 0 200 200" aria-hidden="true">
+          <defs><path id="v2-circ" d="M100 100 m-94 0 a94 94 0 1 1 188 0 a94 94 0 1 1 -188 0"></path></defs>
+          <text font-family="Inter Variable, sans-serif" font-size="5.2" letter-spacing="3.2" fill="#9a7b3f">
+            <textPath href="#v2-circ">FREE MEMBERSHIP · 200 BONUS POINTS · FREE MEMBERSHIP · 200 BONUS POINTS ·</textPath>
+          </text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, reduce, makeFlow } from '../../scripts/motion';
+  const flow = makeFlow(document.getElementById('v2-free-total')!);
+  flow.animated = false;
+  flow.update(reduce ? 1000 : 2000);
+  requestAnimationFrame(() => (flow.animated = true));
+  if (!reduce) {
+    gsap.to('.v2-ring-text', { rotate: 360, duration: 60, repeat: -1, ease: 'none', transformOrigin: '50% 50%' });
+    gsap.set('.v2-free-bb', { opacity: 0, x: 16 });
+    ScrollTrigger.create({
+      trigger: '#v2-free-demo',
+      start: 'top 70%',
+      once: true,
+      onEnter: () => {
+        const tl = gsap.timeline({ delay: 0.3 });
+        document.querySelectorAll('.v2-free-row').forEach((row, i) => {
+          tl.to(row.querySelector('.v2-strike'), { scaleX: 1, duration: 0.4, ease: 'power2.out' }, i * 0.32).to(row.querySelector('.v2-free-bb'), { opacity: 1, x: 0, duration: 0.6, ease: 'expo.out' }, i * 0.32 + 0.15);
+        });
+        tl.add(() => flow.update(1000));
+      },
+    });
+  }
+</script>

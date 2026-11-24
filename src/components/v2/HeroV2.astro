@@ -1,0 +1,123 @@
+---
+import { Picture } from 'astro:assets';
+import hero from '../../assets/v2/hero-sunset.jpg';
+import { contactLink } from '../../config';
+import { guests } from '../../data/content';
+const fmt = (n: number) => n.toLocaleString('ru-RU');
+---
+
+<section id="top" class="relative isolate h-[100svh] min-h-[680px] overflow-hidden bg-onyx text-ivory" aria-label="Главный экран">
+  <!-- Фото -->
+  <div id="v2-hero-media" class="absolute inset-0 -z-10">
+    <div id="v2-hero-img" class="absolute inset-[-4%]">
+      <Picture
+        src={hero}
+        alt="Круизный лайнер идёт навстречу закату"
+        widths={[800, 1280, 1800]}
+        sizes="100vw"
+        formats={['avif', 'webp']}
+        loading="eager"
+        fetchpriority="high"
+        class="h-full w-full object-cover object-[50%_60%]"
+      />
+    </div>
+    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,12,15,0.55)_0%,rgba(11,12,15,0.05)_30%,rgba(11,12,15,0.15)_55%,rgba(11,12,15,0.92)_100%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_75%,rgba(11,12,15,0.75),transparent_55%)]"></div>
+  </div>
+
+  <!-- Кинематографичное открытие -->
+  <div class="pointer-events-none absolute inset-0 z-40" aria-hidden="true">
+    <div class="v2-curtain absolute inset-x-0 top-0 h-1/2 origin-top bg-onyx"></div>
+    <div class="v2-curtain absolute inset-x-0 bottom-0 h-1/2 origin-bottom bg-onyx"></div>
+    <div id="v2-curtain-line" class="absolute top-1/2 left-0 h-px w-full origin-center scale-x-0 bg-champagne"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-end px-5 pb-10 sm:px-8 lg:px-12 lg:pb-14">
+    <div class="max-w-[780px]">
+      <div>
+        <p class="v2-eyebrow v2-hero-fade mb-8">Private travel club · с 2015 года</p>
+        <h1 class="font-serif text-[clamp(2.6rem,min(5.4vw,8.4vh),6rem)] leading-[0.95] font-light tracking-[-0.02em] text-balance" data-split="now" data-split-delay="1.6">
+          Самый ценный в&nbsp;мире клуб <em class="text-champagne-2 italic">туристических вознаграждений</em>
+        </h1>
+      </div>
+      <div class="v2-hero-fade mt-8">
+        <p class="v2-lead max-w-[420px] text-ivory/75">
+          Круизы на&nbsp;лучших лайнерах мира, отели и&nbsp;туры по&nbsp;закрытым клубным ценам — с&nbsp;экономией до&nbsp;100%.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={contactLink()} class="v2-btn-gold">Получить приглашение</a>
+          <a href="#plans" class="v2-btn-line hidden text-ivory sm:inline-flex">Выгода клуба</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="v2-hero-fade mt-12 grid grid-cols-3 border-t border-ivory/15 pt-6 lg:mt-16">
+      <div>
+        <p class="v2-num text-[clamp(1.8rem,3.4vw,3rem)] leading-none text-ivory"><span data-count="193" data-delay="1800">193</span></p>
+        <p class="mt-2 font-inter text-[10px] tracking-[0.24em] text-ivory/55 uppercase sm:text-[11px]">страны</p>
+      </div>
+      <div class="border-l border-ivory/15 pl-4 sm:pl-8">
+        <p class="v2-num text-[clamp(1.8rem,3.4vw,3rem)] leading-none text-ivory"><span data-count="21000" data-suffix="+" data-delay="2000">21 000+</span></p>
+        <p class="mt-2 font-inter text-[10px] tracking-[0.24em] text-ivory/55 uppercase sm:text-[11px]">круизов</p>
+      </div>
+      <div class="border-l border-ivory/15 pl-4 sm:pl-8">
+        <p class="v2-num text-[clamp(1.8rem,3.4vw,3rem)] leading-none text-champagne-2"><span data-count={guests.value} data-delay="2200">{fmt(guests.value)}</span></p>
+        <p class="mt-2 font-inter text-[10px] tracking-[0.24em] text-ivory/55 uppercase sm:text-[11px]">гостей</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Индикатор прокрутки -->
+  <a href="#intro" class="absolute right-8 bottom-14 z-10 hidden flex-col items-center gap-4 lg:flex" aria-label="Листайте вниз">
+    <span class="font-inter text-[10px] tracking-[0.3em] text-ivory/60 uppercase [writing-mode:vertical-rl]">Scroll</span>
+    <span class="relative h-16 w-px overflow-hidden bg-ivory/20">
+      <span class="absolute inset-x-0 top-0 h-1/2 bg-champagne" style="animation: scroll-line 2.2s cubic-bezier(.7,0,.3,1) infinite"></span>
+    </span>
+  </a>
+</section>
+
+<style>
+  @keyframes -global-scroll-line {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(200%);
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reduce } from '../../scripts/motion';
+
+  const img = document.getElementById('v2-hero-img')!;
+  if (reduce) {
+    gsap.set('.v2-curtain', { scaleY: 0 });
+  } else {
+    gsap.set('.v2-hero-fade', { opacity: 0, y: 30 });
+    gsap
+      .timeline()
+      .to('#v2-curtain-line', { scaleX: 1, duration: 0.9, ease: 'expo.inOut' })
+      .to('.v2-curtain', { scaleY: 0, duration: 1.4, ease: 'expo.inOut' }, '+=0.05')
+      .to('#v2-curtain-line', { opacity: 0, duration: 0.4 }, '<')
+      .fromTo(img, { scale: 1.25 }, { scale: 1, duration: 3.2, ease: 'expo.out' }, '<')
+      .to('.v2-hero-fade', { opacity: 1, y: 0, duration: 1.4, ease: 'expo.out', stagger: 0.12 }, '-=2.4');
+
+    // Медленный «дрейф» фото за курсором
+    if (matchMedia('(hover: hover)').matches) {
+      const qx = gsap.quickTo(img, 'x', { duration: 2, ease: 'power3' });
+      const qy = gsap.quickTo(img, 'y', { duration: 2, ease: 'power3' });
+      addEventListener('pointermove', (e) => {
+        qx((e.clientX / innerWidth - 0.5) * -24);
+        qy((e.clientY / innerHeight - 0.5) * -16);
+      });
+    }
+
+    // При прокрутке фото уходит вниз и темнеет
+    gsap.to('#v2-hero-media', {
+      yPercent: 22,
+      ease: 'none',
+      scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: true },
+    });
+  }
+</script>

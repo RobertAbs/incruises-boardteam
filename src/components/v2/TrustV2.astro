@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import { registrations } from '../../data/content';
+import sealCa from '../../assets/brand/seal-ca.png';
+import sealFl from '../../assets/brand/seal-fl.png';
+import sealWa from '../../assets/brand/seal-wa.png';
+import tmt from '../../assets/brand/logo-trustmytravel.png';
+import clia from '../../assets/brand/logo-clia.png';
+import maw from '../../assets/brand/logo-makeawish.png';
+import ocean from '../../assets/brand/logo-4ocean.png';
+import mercy from '../../assets/brand/logo-mercyships.png';
+
+const seals = { ca: sealCa, fl: sealFl, wa: sealWa } as const;
+const logos = [
+  { src: tmt, alt: 'Trust My Travel', h: 'h-7' },
+  { src: clia, alt: 'CLIA — Cruise Lines International Association', h: 'h-10' },
+  { src: maw, alt: 'Make-A-Wish', h: 'h-7' },
+  { src: ocean, alt: '4ocean', h: 'h-6' },
+  { src: mercy, alt: 'Mercy Ships', h: 'h-12' },
+];
+---
+
+<section id="trust" class="relative bg-onyx py-[clamp(90px,12vw,180px)] text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
+      <div>
+        <p class="v2-eyebrow mb-10" data-reveal>Надёжность</p>
+        <h2 class="v2-h" data-split>Легальность. Надёжность. <em class="text-champagne-2 italic">Благотворительность.</em></h2>
+        <p class="v2-lead mt-8 max-w-[440px] text-ivory/60" data-reveal>
+          inCruises зарегистрирован в&nbsp;США, является членом Международной ассоциации круизных линий CLIA и&nbsp;поддерживает благотворительные проекты по&nbsp;всему миру.
+        </p>
+      </div>
+
+      <ul class="self-end">
+        {
+          registrations.map((r) => (
+            <li class="group grid grid-cols-[64px_1fr] items-center gap-6 border-t border-ivory/12 py-7 last:border-b sm:grid-cols-[72px_1fr_auto]" data-reveal>
+              <Image src={seals[r.seal]} alt="" class="h-16 w-16 rounded-full opacity-80 grayscale transition duration-700 group-hover:opacity-100 group-hover:grayscale-0 sm:h-[72px] sm:w-[72px]" width={144} />
+              <div>
+                <p class="font-inter text-[11px] tracking-[0.22em] text-ivory/50 uppercase">Регистрационный номер</p>
+                <p class="mt-1 font-serif text-3xl font-light">
+                  {r.prep === 'во' ? 'Во' : 'В'} {r.state}
+                </p>
+              </div>
+              <p class="v2-num col-span-2 text-2xl text-champagne-2 sm:col-span-1 sm:text-3xl">№ {r.number}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="mt-[clamp(70px,8vw,120px)] grid grid-cols-2 items-center gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5" data-reveal>
+      {logos.map((l) => <Image src={l.src} alt={l.alt} class={`${l.h} w-auto justify-self-center opacity-55 brightness-0 invert transition-opacity duration-500 hover:opacity-100`} width={320} />)}
+    </div>
+  </div>
+</section>

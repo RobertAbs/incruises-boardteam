@@ -1,0 +1,100 @@
+---
+import { Picture } from 'astro:assets';
+import shipSea from '../../assets/v2/ship-sea.jpg';
+import { site } from '../../config';
+
+const c = site.contacts;
+const direct = [
+  c.whatsapp && { href: `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(site.whatsappText)}`, label: 'WhatsApp' },
+  c.telegram && { href: `https://t.me/${c.telegram}`, label: 'Telegram' },
+  c.instagram && { href: `https://instagram.com/${c.instagram}`, label: 'Instagram' },
+].filter(Boolean) as { href: string; label: string }[];
+const interests = ['Первый круиз', 'Членство в клубе', 'Партнёрство и доход', 'Отели и туры'];
+---
+
+<section id="contact" class="relative isolate overflow-hidden bg-onyx py-[clamp(90px,12vw,180px)] text-ivory">
+  <div class="absolute inset-0 -z-10 opacity-35" data-zoom>
+    <Picture src={shipSea} alt="" widths={[800, 1200]} sizes="100vw" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+  </div>
+  <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#0b0c0f_0%,rgba(11,12,15,0.85)_50%,rgba(11,12,15,0.6)_100%)]"></div>
+
+  <div class="mx-auto grid max-w-[1400px] gap-16 px-5 sm:px-8 lg:grid-cols-[1fr_1fr] lg:gap-24 lg:px-12">
+    <div>
+      <p class="v2-eyebrow mb-10" data-reveal>Личный консультант</p>
+      <h2 class="v2-h" data-split>Начнём <em class="text-champagne-2 italic">с&nbsp;разговора</em></h2>
+      <p class="v2-lead mt-8 max-w-[460px] text-ivory/65" data-reveal>
+        Расскажите, какой отдых вам по&nbsp;душе. Подберём план членства, ответим на&nbsp;вопросы о&nbsp;клубе и&nbsp;партнёрстве — конфиденциально и&nbsp;без
+        обязательств.
+      </p>
+      {
+        direct.length > 0 && (
+          <div class="mt-10 flex flex-wrap gap-3" data-reveal>
+            {direct.map((d) => (
+              <a href={d.href} target="_blank" rel="noopener" class="v2-btn-line text-ivory">
+                {d.label}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+
+    <form id="v2-lead-form" class="self-end" data-reveal novalidate>
+      <label class="block border-b border-ivory/25 pb-3 transition-colors focus-within:border-champagne">
+        <span class="font-inter text-[10px] tracking-[0.28em] text-ivory/50 uppercase">Как к вам обращаться</span>
+        <input name="name" autocomplete="given-name" class="mt-2 w-full bg-transparent font-serif text-3xl font-light text-ivory outline-none placeholder:text-ivory/25" placeholder="Ваше имя" />
+      </label>
+
+      <fieldset class="mt-10">
+        <legend class="font-inter text-[10px] tracking-[0.28em] text-ivory/50 uppercase">Что вас интересует</legend>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {
+            interests.map((t, i) => (
+              <label class="cursor-pointer">
+                <input type="checkbox" name="interest" value={t} class="peer sr-only" checked={i === 0} />
+                <span class="inline-block border border-ivory/25 px-4 py-2.5 font-inter text-xs tracking-wide text-ivory/80 transition peer-checked:border-champagne peer-checked:bg-champagne peer-checked:text-onyx peer-focus-visible:ring-1 peer-focus-visible:ring-champagne hover:border-champagne/60">
+                  {t}
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <label class="mt-10 block border-b border-ivory/25 pb-3 transition-colors focus-within:border-champagne">
+        <span class="font-inter text-[10px] tracking-[0.28em] text-ivory/50 uppercase">Пожелания к путешествию</span>
+        <textarea name="wish" rows="2" class="mt-2 w-full resize-none bg-transparent font-inter text-base font-light text-ivory outline-none placeholder:text-ivory/25" placeholder="Направление, даты, количество гостей"></textarea>
+      </label>
+
+      <button type="submit" class="v2-btn-gold mt-10 w-full sm:w-auto">Отправить в WhatsApp</button>
+      <p class="mt-4 font-inter text-xs font-light text-ivory/45">Сообщение откроется в мессенджере — вы сможете проверить его перед отправкой.</p>
+      <p id="v2-lead-error" class="mt-3 hidden font-inter text-sm text-[#e6a3a3]" role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<script define:vars={{ contacts: site.contacts }}>
+  const form = document.getElementById('v2-lead-form');
+  const err = document.getElementById('v2-lead-error');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const name = String(fd.get('name') || '').trim();
+    if (!name) {
+      err.textContent = 'Пожалуйста, укажите имя';
+      err.classList.remove('hidden');
+      form.querySelector('[name=name]').focus();
+      return;
+    }
+    err.classList.add('hidden');
+    const interests = fd.getAll('interest').join(', ');
+    const wish = String(fd.get('wish') || '').trim();
+    const text = [`Здравствуйте! Меня зовут ${name}.`, interests && `Интересует: ${interests}.`, wish && `Пожелания: ${wish}`].filter(Boolean).join('\n');
+    const url = contacts.whatsapp
+      ? `https://wa.me/${contacts.whatsapp}?text=${encodeURIComponent(text)}`
+      : contacts.telegram
+        ? `https://t.me/${contacts.telegram}`
+        : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>

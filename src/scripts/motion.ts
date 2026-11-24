@@ -8,6 +8,30 @@ import type NumberFlow from 'number-flow';
 
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, DrawSVGPlugin);
 
+/*
+ * `once: true` заставляет ScrollTrigger удалять себя сразу после срабатывания.
+ * Если это происходит во время первичного пересчёта (элемент уже на экране),
+ * внутренний список триггеров меняется на лету и GSAP падает с
+ * «Cannot read properties of undefined (reading 'end')».
+ * Поэтому «один раз» реализуем без самоудаления: флагом для колбэков
+ * и toggleActions для анимаций.
+ */
+const nativeCreate = ScrollTrigger.create.bind(ScrollTrigger);
+(ScrollTrigger as any).create = (vars: ScrollTrigger.Vars & { animation?: unknown }) => {
+  if (!vars?.once) return nativeCreate(vars);
+  const { once: _once, onEnter, ...rest } = vars;
+  let done = false;
+  return nativeCreate({
+    ...rest,
+    ...(rest.animation ? { toggleActions: 'play none none none' } : {}),
+    onEnter: (self) => {
+      if (done) return;
+      done = true;
+      onEnter?.(self);
+    },
+  });
+};
+
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
 
@@ -60,9 +84,13 @@ document.querySelectorAll<HTMLElement>('[data-count]').forEach((host) => {
   const from = Number(host.dataset.from ?? 0);
   const flow = makeFlow(host);
   flow.animated = false;
-  flow.update(from);
+  flow.update(reduce ? to : from);
   requestAnimationFrame(() => (flow.animated = true));
   (host as any).__flow = flow;
+  if (reduce) {
+    host.dispatchEvent(new CustomEvent('counted'));
+    return;
+  }
   ScrollTrigger.create({
     trigger: host,
     start: 'top 88%',
@@ -118,7 +146,7 @@ if (!reduce) {
       duration: 1.1,
       ease: 'expo.out',
       stagger: 0.06,
-      delay: immediate ? 0.25 : 0,
+      delay: immediate ? Number(el.dataset.splitDelay ?? 0.25) : 0,
       scrollTrigger: immediate ? undefined : { trigger: el, start: 'top 85%', once: true },
     });
   });
@@ -132,6 +160,25 @@ if (!reduce) {
         { opacity: 0, y: 40, scale: 0.98 },
         { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'expo.out', stagger: 0.08, overwrite: true },
       ),
+  });
+
+  /* Фото раскрываются «шторкой» */
+  document.querySelectorAll<HTMLElement>('[data-mask]').forEach((el) => {
+    const img = el.querySelector('img');
+    const dir = el.dataset.mask || 'up';
+    const from = dir === 'left' ? 'inset(0 100% 0 0)' : dir === 'right' ? 'inset(0 0 0 100%)' : 'inset(100% 0 0 0)';
+    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
+    tl.fromTo(el, { clipPath: from }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' });
+    if (img) tl.fromTo(img, { scale: 1.3 }, { scale: 1, duration: 2.2, ease: 'expo.out' }, 0.2);
+  });
+
+  /* Медленный зум фото при прокрутке */
+  document.querySelectorAll<HTMLElement>('[data-zoom]').forEach((el) => {
+    gsap.fromTo(
+      el,
+      { scale: 1.18, yPercent: -4 },
+      { scale: 1, yPercent: 4, ease: 'none', scrollTrigger: { trigger: el.parentElement ?? el, start: 'top bottom', end: 'bottom top', scrub: true } },
+    );
   });
 
   /* Параллакс декоративных элементов */

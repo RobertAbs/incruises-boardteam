@@ -1,0 +1,55 @@
+---
+import { bonuses, perks, payouts } from '../../data/content';
+---
+
+<section id="rewards" class="relative bg-onyx py-[clamp(90px,12vw,180px)] text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="max-w-[760px]">
+      <p class="v2-eyebrow mb-10" data-reveal>Компенсационный план</p>
+      <h2 class="v2-h" data-split>Щедрые <em class="text-champagne-2 italic">вознаграждения</em></h2>
+    </div>
+
+    <div class="mt-[clamp(50px,7vw,90px)] grid gap-16 lg:grid-cols-[1.4fr_1fr] lg:gap-24">
+      <!-- Бонусы в стиле «прейскуранта» -->
+      <ol>
+        {
+          bonuses.map((b, i) => (
+            <li class="v2-bonus group flex items-baseline gap-4 border-b border-ivory/10 py-5 first:border-t">
+              <span class="v2-num w-8 shrink-0 text-lg text-ivory/35">{String(i + 1).padStart(2, '0')}</span>
+              <span class:list={['font-serif text-[clamp(1.3rem,2vw,1.7rem)] leading-tight', b.highlight && 'text-champagne-2 italic']}>{b.name}</span>
+              <span class="mx-2 hidden flex-1 translate-y-[-4px] border-b border-dotted border-ivory/25 sm:block" />
+              <span class="ml-auto shrink-0 text-right font-inter text-sm tracking-wide text-ivory/80 sm:ml-0">{b.range}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div>
+        <p class="font-inter text-[11px] tracking-[0.28em] text-champagne uppercase">Клубные привилегии</p>
+        <ul class="mt-6 space-y-8">
+          {
+            perks.map((p) => (
+              <li class="border-l border-champagne/40 pl-6" data-reveal>
+                <p class="font-serif text-2xl">{p.name}</p>
+                <p class="mt-1 font-inter text-sm leading-relaxed font-light text-ivory/65">{p.value}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="mt-12 border-t border-ivory/10 pt-6">
+          <p class="font-inter text-[11px] tracking-[0.28em] text-ivory/50 uppercase">Вывод средств</p>
+          <p class="mt-4 flex flex-wrap gap-x-6 gap-y-2 font-serif text-xl text-ivory/85 italic">
+            {payouts.map((p) => <span>{p}</span>)}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../../scripts/motion';
+  if (!reduce) {
+    gsap.from('.v2-bonus', { opacity: 0, y: 20, duration: 1, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: '.v2-bonus', start: 'top 85%', once: true } });
+  }
+</script>

@@ -1,0 +1,83 @@
+---
+import { partnerTiers, earnings } from '../../data/content';
+const metal: Record<string, string> = {
+  starter: 'bg-[radial-gradient(circle_at_30%_25%,#ffffff,#d9dde3_40%,#8c939d)] text-[#4b525c]',
+  classic: 'bg-[radial-gradient(circle_at_30%_25%,#fff3c9,#e2c27a_40%,#8f7136)] text-[#5c4515]',
+  premium: 'bg-[radial-gradient(circle_at_30%_25%,#6a6e76,#25272c_45%,#08080a)] text-champagne-2',
+};
+---
+
+<section id="partner" class="relative bg-ivory py-[clamp(90px,12vw,180px)] text-onyx">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="grid items-end gap-10 lg:grid-cols-[1.4fr_1fr]">
+      <div>
+        <p class="v2-eyebrow mb-10 !text-[#9a7b3f]" data-reveal>Партнёрство</p>
+        <h2 class="v2-h" data-split>Станьте <em class="text-[#9a7b3f] italic">членом-партнёром</em> клуба</h2>
+      </div>
+      <p class="v2-lead text-onyx/65" data-reveal>
+        Добавьте <span class="font-serif text-2xl text-onyx italic">$95</span> к&nbsp;любому членству и&nbsp;откройте полный доступ к&nbsp;возможностям получения дохода в&nbsp;долларах.
+      </p>
+    </div>
+
+    <div class="mt-[clamp(50px,7vw,90px)] grid border-t border-onyx/15 md:grid-cols-3">
+      {
+        partnerTiers.map((t, i) => (
+          <article class:list={['v2-tier flex flex-col items-center py-14 text-center', i > 0 && 'border-t border-onyx/15 md:border-t-0 md:border-l']} data-reveal>
+            <div class="relative">
+              <div class={`v2-coin grid h-32 w-32 place-items-center rounded-full shadow-[0_30px_50px_-25px_rgba(0,0,0,0.6),inset_0_-6px_14px_rgba(0,0,0,0.2)] ${metal[t.id]}`}>
+                <span class="font-serif text-6xl font-light italic">{t.letter}</span>
+              </div>
+              <span class="v2-plus absolute -right-8 -bottom-1 grid h-16 w-16 place-items-center rounded-full border border-onyx/15 bg-ivory font-serif text-lg italic shadow-lg">+$95</span>
+            </div>
+            <p class="mt-10 font-inter text-[11px] tracking-[0.3em] text-onyx/55 uppercase">{t.name}</p>
+            <p class="v2-num mt-3 text-[clamp(3.4rem,5vw,4.6rem)] leading-none">
+              <span class="v2-tier-sum" data-base={t.base} data-total={t.total} data-prefix="$">${t.total}</span>
+            </p>
+            <p class="mt-3 font-inter text-xs font-light text-onyx/55">
+              членство ${t.base} + партнёрство $95
+            </p>
+          </article>
+        ))
+      }
+    </div>
+    <p class="border-t border-onyx/15 pt-6 text-center font-inter text-[11px] tracking-[0.24em] text-onyx/55 uppercase" data-reveal>Партнёрство оплачивается каждые 6&nbsp;месяцев</p>
+
+    <div class="mt-16 flex flex-col gap-8 bg-onyx p-8 text-ivory sm:p-12 lg:flex-row lg:items-center lg:justify-between" data-reveal>
+      <p class="font-serif text-4xl font-light italic">Зарабатывайте</p>
+      <ul class="flex flex-wrap gap-x-10 gap-y-4">
+        {
+          earnings.map((e, i) => (
+            <li class:list={['flex items-center gap-3 font-inter text-sm tracking-wide', i === earnings.length - 1 ? 'text-champagne-2' : 'text-ivory/85']}>
+              <span class="h-1.5 w-1.5 rotate-45 bg-champagne" />
+              {e}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, reduce, makeFlow } from '../../scripts/motion';
+  document.querySelectorAll<HTMLElement>('.v2-tier').forEach((tier, i) => {
+    const sum = tier.querySelector<HTMLElement>('.v2-tier-sum')!;
+    const flow = makeFlow(sum);
+    const plus = tier.querySelector<HTMLElement>('.v2-plus')!;
+    flow.animated = false;
+    flow.update(reduce ? Number(sum.dataset.total) : Number(sum.dataset.base));
+    requestAnimationFrame(() => (flow.animated = true));
+    if (reduce) return;
+    gsap.set(plus, { opacity: 0, scale: 0.5, x: 40, y: -40 });
+    ScrollTrigger.create({
+      trigger: tier,
+      start: 'top 75%',
+      once: true,
+      onEnter: () =>
+        gsap
+          .timeline({ delay: 0.4 + i * 0.2 })
+          .to(plus, { opacity: 1, scale: 1, x: 0, y: 0, duration: 1.2, ease: 'expo.out' })
+          .add(() => flow.update(Number(sum.dataset.total)), '-=0.6'),
+    });
+  });
+</script>

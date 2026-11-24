@@ -1,0 +1,52 @@
+---
+import { leadership, leadershipColumns } from '../../data/content';
+const hasHeaders = leadershipColumns.some(Boolean);
+---
+
+<section id="leadership" class="relative bg-onyx py-[clamp(90px,12vw,180px)] text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+      <div class="max-w-[760px]">
+        <p class="v2-eyebrow mb-10" data-reveal>Карьерная лестница</p>
+        <h2 class="v2-h" data-split>Командный <em class="text-champagne-2 italic">лидерский бонус</em></h2>
+      </div>
+      <p class="font-serif text-3xl font-light text-champagne-2 italic" data-reveal>до&nbsp;100% экономии на&nbsp;круизы</p>
+    </div>
+
+    <div class="mt-[clamp(50px,7vw,90px)]">
+      {
+        hasHeaders && (
+          <div class="hidden grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] gap-6 border-b border-ivory/15 pb-4 font-inter text-[10px] tracking-[0.24em] text-ivory/50 uppercase md:grid">
+            <span>Ранг</span>
+            {leadershipColumns.map((c) => (
+              <span>{c}</span>
+            ))}
+          </div>
+        )
+      }
+      <ol>
+        {
+          leadership.map((r) => (
+            <li class="v2-rank group grid grid-cols-2 items-baseline gap-x-6 gap-y-2 border-b border-ivory/10 py-6 transition-colors duration-500 first:border-t hover:bg-ivory/[0.03] md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))]">
+              <span class="col-span-2 flex items-center gap-4 md:col-span-1">
+                <span class="h-2.5 w-2.5 shrink-0 rotate-45" style={`background:${r.color}`} />
+                <span class="font-serif text-2xl font-light">{r.rank}</span>
+                {r.crown && <span class="font-inter text-[10px] tracking-[0.24em] text-champagne uppercase">Top</span>}
+              </span>
+              {r.values.map((v, j) => (
+                <span class:list={['v2-num text-2xl', j === 0 ? 'text-champagne-2' : j === 3 ? 'text-ivory/55' : 'text-ivory/90']}>{v}</span>
+              ))}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduce } from '../../scripts/motion';
+  if (!reduce) {
+    gsap.from(gsap.utils.toArray('.v2-rank').reverse(), { opacity: 0, y: 24, duration: 1, ease: 'expo.out', stagger: 0.09, scrollTrigger: { trigger: '.v2-rank', start: 'top 85%', once: true } });
+  }
+</script>

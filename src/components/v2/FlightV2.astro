@@ -1,0 +1,17 @@
+---
+import { Picture } from 'astro:assets';
+import plane from '../../assets/v2/plane-sky.jpg';
+---
+
+<section class="relative h-[85svh] min-h-[520px] overflow-hidden bg-onyx text-ivory" aria-label="Перелёт">
+  <div class="absolute inset-0" data-zoom>
+    <Picture src={plane} alt="Самолёт над облаками в лучах солнца" widths={[800, 1280, 1920]} sizes="100vw" formats={['avif', 'webp']} class="h-full w-full object-cover object-[60%_50%]" />
+  </div>
+  <div class="absolute inset-0 bg-[linear-gradient(180deg,#0b0c0f_0%,rgba(11,12,15,0.1)_30%,rgba(11,12,15,0.1)_60%,#0b0c0f_100%)]"></div>
+  <div class="relative mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 sm:px-8 lg:px-12">
+    <p class="v2-eyebrow mb-8" data-reveal>Путешествие начинается</p>
+    <p class="max-w-[900px] font-serif text-[clamp(2.4rem,6vw,5.8rem)] leading-[0.98] font-light text-balance [text-shadow:0_2px_40px_rgba(0,0,0,0.35)]" data-split>
+      Над облаками — <em class="text-champagne-2 italic">к&nbsp;вашему лайнеру</em>
+    </p>
+  </div>
+</section>

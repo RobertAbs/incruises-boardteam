@@ -1,0 +1,54 @@
+---
+import { Picture } from 'astro:assets';
+import venice from '../../assets/v2/venice.jpg';
+import colosseum from '../../assets/v2/colosseum.jpg';
+import { stats, guests } from '../../data/content';
+const fmt = (n: number) => n.toLocaleString('ru-RU');
+const all = [{ value: guests.value, suffix: '', label: guests.label }, ...stats];
+---
+
+<section id="intro" class="relative bg-ivory py-[clamp(90px,12vw,180px)] text-onyx">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="grid gap-16 lg:grid-cols-[1.1fr_1fr] lg:gap-24">
+      <div>
+        <p class="v2-eyebrow mb-10 !text-[#9a7b3f]" data-reveal>О клубе</p>
+        <h2 class="v2-h" data-split>
+          Роскошные путешествия — <em class="text-[#9a7b3f] italic">по&nbsp;клубным правилам</em>
+        </h2>
+        <p class="v2-lead mt-10 max-w-[520px] text-onyx/70" data-reveal>
+          С&nbsp;2015 года inCruises открывает своим членам лучшие круизные линии, отели и&nbsp;туры мира — по&nbsp;ценам, недоступным в&nbsp;обычной
+          продаже. Все налоги, сборы и&nbsp;чаевые включены.
+        </p>
+        <div class="mt-12 flex items-center gap-4 font-inter text-xs tracking-[0.2em] text-onyx/60 uppercase" data-reveal>
+          <span class="relative inline-block h-2 w-2 rounded-full bg-emerald-600 text-emerald-600 live-dot"></span>
+          Информация обновляется ежедневно
+        </div>
+      </div>
+
+      <div class="relative h-[460px] sm:h-[560px]">
+        <div class="absolute top-0 right-0 h-[78%] w-[78%] overflow-hidden" data-mask>
+          <Picture src={venice} alt="Венеция, Гранд-канал" widths={[600, 1080]} sizes="(min-width:1024px) 40vw, 80vw" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+        </div>
+        <div class="absolute bottom-0 left-0 h-[48%] w-[52%] overflow-hidden border-[10px] border-ivory" data-mask="left" data-parallax="80">
+          <Picture src={colosseum} alt="Колизей на закате, Рим" widths={[400, 704]} sizes="30vw" formats={['avif', 'webp']} class="h-full w-full object-cover" />
+        </div>
+      </div>
+    </div>
+
+    <div id="numbers" class="mt-[clamp(80px,10vw,140px)] grid scroll-mt-24 grid-cols-2 border-t border-onyx/15 lg:grid-cols-5">
+      {
+        all.map((s, i) => (
+          <div class:list={['py-8 pr-4', i > 0 && 'lg:border-l lg:border-onyx/15 lg:pl-8', i % 2 === 1 && 'border-l border-onyx/15 pl-5 lg:pl-8', i === 0 && 'col-span-2 border-b border-onyx/15 lg:col-span-1 lg:border-b-0']} data-reveal>
+            <p class:list={['v2-num leading-none', i === 0 ? 'text-[clamp(3rem,5vw,4.2rem)] text-[#9a7b3f]' : 'text-[clamp(2.4rem,4vw,3.4rem)]']}>
+              <span data-count={s.value} data-suffix={s.suffix} data-delay={i * 120}>
+                {fmt(s.value)}
+                {s.suffix}
+              </span>
+            </p>
+            <p class="mt-4 max-w-[220px] font-inter text-[11px] leading-relaxed tracking-[0.18em] text-onyx/60 uppercase">{s.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+---
+import { Picture } from 'astro:assets';
+import river from '../../assets/stories/family-river.jpg';
+import airport from '../../assets/stories/airport.jpg';
+import dinner from '../../assets/stories/ship-dinner.jpg';
+import dubai from '../../assets/stories/dubai.jpg';
+import abuDhabi from '../../assets/stories/abu-dhabi.jpg';
+
+const items = [
+  { src: dinner, alt: 'Семья за ужином на борту лайнера', caption: 'Ужин на борту' },
+  { src: abuDhabi, alt: 'Семья в Абу-Даби', caption: 'Абу-Даби' },
+  { src: dubai, alt: 'Отец с сыновьями в Дубай Марине', caption: 'Дубай' },
+  { src: airport, alt: 'Семья в аэропорту', caption: 'В путь' },
+  { src: river, alt: 'Семья на набережной', caption: 'Вместе' },
+];
+---
+
+<section id="stories" class="relative bg-onyx py-[clamp(90px,12vw,160px)] text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="grid items-end gap-8 lg:grid-cols-[1fr_1fr]">
+      <div>
+        <p class="v2-eyebrow mb-10" data-reveal>Команда BoardTeam</p>
+        <h2 class="v2-h" data-split>Истории <em class="text-champagne-2 italic">наших участников</em></h2>
+      </div>
+      <p class="v2-lead max-w-[440px] text-ivory/60 lg:justify-self-end" data-reveal>Семьи, дети и&nbsp;новые страны — реальные путешествия членов клуба.</p>
+    </div>
+
+    <div class="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
+      {
+        items.map((it, i) => (
+          <figure class:list={['group relative aspect-[3/4] overflow-hidden', i === 4 && 'hidden sm:block']} data-reveal>
+            <Picture
+              src={it.src}
+              alt={it.alt}
+              widths={[300, 560]}
+              sizes="(min-width:1024px) 20vw, 45vw"
+              formats={['avif', 'webp']}
+              class="h-full w-full object-cover grayscale-[0.85] transition duration-1000 group-hover:scale-105 group-hover:grayscale-0"
+              loading="lazy"
+            />
+            <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-onyx/90 to-transparent p-4 pt-12 font-serif text-lg italic">{it.caption}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

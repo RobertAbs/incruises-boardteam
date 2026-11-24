@@ -1,0 +1,93 @@
+---
+import { Picture } from 'astro:assets';
+import bhutan from '../../assets/v2/bhutan.jpg';
+import coast from '../../assets/v2/coast.jpg';
+import venice from '../../assets/v2/venice.jpg';
+import island from '../../assets/v2/island.jpg';
+import colosseum from '../../assets/v2/colosseum.jpg';
+import aerial from '../../assets/v2/ship-aerial.jpg';
+import pier from '../../assets/v2/ships-pier.jpg';
+
+const items = [
+  { src: aerial, alt: 'Лайнер в открытом море, вид сверху', title: 'Открытый океан', tag: 'Круизы', w: 'w-[min(82vw,620px)]' },
+  { src: venice, alt: 'Венеция', title: 'Венеция', tag: 'Средиземноморье', w: 'w-[min(72vw,520px)]' },
+  { src: bhutan, alt: 'Монастырь в горах Гималаев', title: 'Гималаи', tag: 'Экспедиции', w: 'w-[min(62vw,400px)]' },
+  { src: coast, alt: 'Длинная песчаная коса между двумя морями', title: 'Карибы', tag: 'Пляжи', w: 'w-[min(72vw,520px)]' },
+  { src: island, alt: 'Остров с монастырём посреди бирюзового озера', title: 'Адриатика', tag: 'Острова', w: 'w-[min(62vw,380px)]' },
+  { src: colosseum, alt: 'Колизей на закате', title: 'Рим', tag: 'Культура', w: 'w-[min(72vw,520px)]' },
+  { src: pier, alt: 'Круизные лайнеры у причала', title: 'Ваш следующий порт', tag: 'Выбор за вами', w: 'w-[min(82vw,620px)]' },
+];
+---
+
+<section id="destinations" class="relative overflow-hidden bg-ivory text-onyx">
+  <div id="v2-dest-pin" class="flex min-h-[100svh] flex-col justify-center py-20">
+    <div class="mx-auto mb-12 flex w-full max-w-[1400px] items-end justify-between gap-8 px-5 sm:px-8 lg:px-12">
+      <div>
+        <p class="v2-eyebrow mb-8 !text-[#9a7b3f]" data-reveal>Направления</p>
+        <h2 class="v2-h" data-split>Мир, <em class="text-[#9a7b3f] italic">открытый для вас</em></h2>
+      </div>
+      <p class="hidden font-inter text-[11px] tracking-[0.28em] text-onyx/50 uppercase md:block">
+        <span id="v2-dest-i">01</span> / {String(items.length).padStart(2, '0')}
+      </p>
+    </div>
+    <div id="v2-dest-track" class="flex w-max items-end gap-6 px-5 sm:px-8 lg:gap-10 lg:px-12">
+      {
+        items.map((it, i) => (
+          <figure class={`v2-dest shrink-0 ${it.w}`}>
+            <div class="h-[min(56vh,520px)] overflow-hidden">
+              <Picture src={it.src} alt={it.alt} widths={[480, 900]} sizes="600px" formats={['avif', 'webp']} class="v2-dest-img h-full w-full scale-110 object-cover" loading="lazy" />
+            </div>
+            <figcaption class="mt-5 flex items-baseline justify-between gap-4 border-t border-onyx/15 pt-4">
+              <span class="font-serif text-3xl font-light">{it.title}</span>
+              <span class="font-inter text-[10px] tracking-[0.26em] text-onyx/50 uppercase">
+                {String(i + 1).padStart(2, '0')} · {it.tag}
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, reduce } from '../../scripts/motion';
+  const track = document.getElementById('v2-dest-track')!;
+  const counter = document.getElementById('v2-dest-i')!;
+  const figs = gsap.utils.toArray<HTMLElement>('.v2-dest');
+
+  if (reduce) {
+    track.classList.add('overflow-x-auto');
+  } else {
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 768px)', () => {
+      const dist = () => track.scrollWidth - innerWidth;
+      const tween = gsap.to(track, {
+        x: () => -dist(),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#v2-dest-pin',
+          start: 'top top',
+          end: () => `+=${dist()}`,
+          pin: true,
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+          onUpdate: (st) => (counter.textContent = String(Math.min(figs.length, Math.floor(st.progress * figs.length) + 1)).padStart(2, '0')),
+        },
+      });
+      // Каждое фото слегка «проявляется» и смещается внутри рамки
+      figs.forEach((f) => {
+        gsap.fromTo(
+          f.querySelector('.v2-dest-img'),
+          { xPercent: 6 },
+          { xPercent: -6, ease: 'none', scrollTrigger: { trigger: f, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } },
+        );
+      });
+    });
+    mm.add('(max-width: 767px)', () => {
+      track.parentElement!.classList.add('overflow-x-auto', '[scrollbar-width:none]');
+      track.classList.add('snap-x', 'snap-mandatory');
+      track.setAttribute('data-lenis-prevent-wheel', '');
+    });
+  }
+</script>

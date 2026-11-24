@@ -1,0 +1,220 @@
+---
+import { plans } from '../../data/content';
+import { contactLink } from '../../config';
+const fmt = (n: number) => n.toLocaleString('ru-RU');
+const first = plans[0];
+---
+
+<section id="plans" class="relative bg-onyx py-[clamp(90px,12vw,180px)] text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
+      <div class="max-w-[760px]">
+        <p class="v2-eyebrow mb-10" data-reveal>Калькулятор выгоды</p>
+        <h2 class="v2-h" data-split>Как работает <em class="text-champagne-2 italic">клубная экономия</em></h2>
+        <p class="v2-lead mt-8 max-w-[520px] text-ivory/60" data-reveal>
+          Членские взносы превращаются в&nbsp;бонусные баллы (ББ), а&nbsp;баллами оплачивается до&nbsp;половины стоимости круиза.
+        </p>
+      </div>
+      <div role="tablist" aria-label="План членства" class="flex gap-8 self-start lg:self-auto" data-reveal>
+        {
+          plans.map((p, i) => (
+            <button role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-plan-tab={p.id} class="group relative pb-3 text-left text-ivory/45 transition-colors aria-selected:text-ivory">
+              <span class="block font-inter text-[10px] tracking-[0.3em] uppercase">План</span>
+              <span class="font-serif text-4xl font-light italic">{p.name}</span>
+              <span class="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-champagne transition-transform duration-500 group-aria-selected:scale-x-100" />
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <script type="application/json" id="plans-data" set:html={JSON.stringify(plans)} />
+
+    <div class="mt-[clamp(50px,7vw,90px)] grid border border-ivory/12 lg:grid-cols-[1fr_1.2fr]" data-reveal>
+      <!-- Взносы -->
+      <div class="border-b border-ivory/12 p-6 sm:p-10 lg:border-r lg:border-b-0">
+        <div class="flex items-center justify-between">
+          <p class="font-inter text-[11px] tracking-[0.26em] text-ivory/60 uppercase">Членские взносы</p>
+          <button id="plan-play" class="font-inter text-[11px] tracking-[0.26em] text-champagne uppercase hover:text-champagne-2">↻ Проиграть</button>
+        </div>
+        <ol id="plan-steps" class="mt-8" aria-live="polite"></ol>
+        <template id="plan-step-tpl">
+          <li class="plan-step flex items-center justify-between gap-4 border-b border-ivory/10 py-4 transition-opacity duration-500">
+            <span class="flex items-center gap-4">
+              <span class="step-dot v2-num w-6 text-lg text-ivory/40"></span>
+              <span class="step-label font-inter text-sm font-light"></span>
+            </span>
+            <span class="v2-num text-xl">
+              <span class="step-usd"></span>
+              <span class="mx-2 text-ivory/30">→</span>
+              <span class="step-bb text-champagne-2"></span>
+            </span>
+          </li>
+        </template>
+
+        <label for="plan-range" class="mt-8 flex justify-between font-inter text-[10px] tracking-[0.26em] text-ivory/50 uppercase">
+          <span>Прогресс оплаты</span>
+          <span id="plan-range-label"></span>
+        </label>
+        <input id="plan-range" type="range" min="0" max={first.steps.length} value={first.steps.length} class="mt-4 h-px w-full cursor-pointer appearance-none bg-ivory/20 accent-champagne" />
+
+        <div class="mt-10 grid grid-cols-2 gap-6">
+          <div>
+            <p class="font-inter text-[10px] tracking-[0.26em] text-ivory/50 uppercase">Оплачено</p>
+            <p class="v2-num mt-2 text-4xl"><span id="o-paid" data-suffix=" $">{fmt(first.usdInMembership)} $</span></p>
+          </div>
+          <div class="relative">
+            <p class="font-inter text-[10px] tracking-[0.26em] text-ivory/50 uppercase">Начислено</p>
+            <p class="v2-num mt-2 text-4xl text-champagne-2"><span id="o-bb" data-suffix=" ББ">{fmt(first.bbTotal)} ББ</span></p>
+            <span id="bb-pop" class="pointer-events-none absolute top-0 right-0 font-serif text-lg text-champagne italic opacity-0"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Круиз -->
+      <div class="flex flex-col bg-ivory p-6 text-onyx sm:p-10">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="font-inter text-[11px] tracking-[0.26em] text-onyx/50 uppercase">Пример</p>
+            <p class="mt-1 font-serif text-3xl italic">Круиз на двоих</p>
+          </div>
+          <p class="v2-num text-6xl"><span id="o-cruise" data-suffix=" $">{fmt(first.cruise)} $</span></p>
+        </div>
+
+        <div class="mt-10">
+          <div class="flex h-14 overflow-hidden">
+            <div id="bar-bb" class="flex items-center bg-[linear-gradient(90deg,#9a7b3f,#c8a96a)] px-4 font-inter text-[10px] tracking-[0.24em] text-onyx uppercase transition-[width] duration-700 ease-(--ease-out-expo)" style={`width:${(first.bbTotal / first.cruise) * 100}%`}>
+              Баллами
+            </div>
+            <div class="flex flex-1 items-center justify-end bg-onyx px-4 font-inter text-[10px] tracking-[0.24em] text-ivory uppercase">Деньгами</div>
+          </div>
+          <div class="mt-3 flex justify-between v2-num text-lg">
+            <span class="text-[#9a7b3f]"><span id="o-bbpart" data-suffix=" ББ">{fmt(first.bbTotal)} ББ</span></span>
+            <span><span id="o-cash" data-suffix=" $">{fmt(first.cashPart)} $</span></span>
+          </div>
+        </div>
+
+        <div class="mt-10 grid border-t border-onyx/15 sm:grid-cols-3">
+          <div class="py-5 sm:pr-4">
+            <p class="font-inter text-[10px] tracking-[0.22em] text-onyx/50 uppercase">Взносы</p>
+            <p class="v2-num mt-1 text-3xl"><span id="o-paid2" data-suffix=" $">{fmt(first.usdInMembership)} $</span></p>
+          </div>
+          <div class="border-t border-onyx/15 py-5 sm:border-t-0 sm:border-l sm:px-4">
+            <p class="font-inter text-[10px] tracking-[0.22em] text-onyx/50 uppercase">Из собственных средств</p>
+            <p class="v2-num mt-1 text-3xl"><span id="o-own" data-suffix=" $">{fmt(first.own)} $</span></p>
+          </div>
+          <div class="border-t border-onyx/15 py-5 sm:border-t-0 sm:border-l sm:pl-4">
+            <p class="font-inter text-[10px] tracking-[0.22em] text-[#9a7b3f] uppercase">Ваша выгода</p>
+            <p class="v2-num mt-1 text-4xl text-[#9a7b3f]"><span id="o-benefit" data-suffix=" $">{fmt(first.benefit)} $</span></p>
+          </div>
+        </div>
+
+        <p class="mt-6 font-inter text-xs leading-relaxed font-light text-onyx/55">
+          Расчёт по&nbsp;примеру из&nbsp;презентации: 1&nbsp;ББ используется как 1&nbsp;$ при оплате круиза. Условия начисления и&nbsp;использования баллов определяются действующими правилами программы inCruises.
+        </p>
+        <a href={contactLink()} class="v2-btn mt-8 self-start bg-onyx text-ivory hover:bg-[#9a7b3f]">Подобрать план</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { ScrollTrigger, reduce, makeFlow } from '../../scripts/motion';
+  import type { Plan } from '../../data/content';
+
+  const plans: Plan[] = JSON.parse(document.getElementById('plans-data')!.textContent!);
+  const $ = (id: string) => document.getElementById(id)!;
+  const stepsEl = $('plan-steps');
+  const tpl = $('plan-step-tpl') as HTMLTemplateElement;
+  const range = $('plan-range') as HTMLInputElement;
+  const rangeLabel = $('plan-range-label');
+  const bar = $('bar-bb');
+  const pop = $('bb-pop');
+  const fmt = (n: number) => n.toLocaleString('ru-RU');
+
+  const ids = ['o-paid', 'o-bb', 'o-cruise', 'o-bbpart', 'o-cash', 'o-paid2', 'o-own', 'o-benefit'] as const;
+  const flows = Object.fromEntries(ids.map((id) => [id, makeFlow($(id))])) as Record<(typeof ids)[number], ReturnType<typeof makeFlow>>;
+
+  let plan = plans[0];
+  let step = plan.steps.length;
+  let timer: number | undefined;
+
+  const renderSteps = () => {
+    stepsEl.replaceChildren(
+      ...plan.steps.map((s, i) => {
+        const li = tpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
+        li.querySelector('.step-dot')!.textContent = String(i + 1).padStart(2, '0');
+        li.querySelector('.step-label')!.textContent = s.label;
+        li.querySelector('.step-usd')!.textContent = `${fmt(s.usd)} $`;
+        li.querySelector('.step-bb')!.textContent = `${fmt(s.bb)} ББ`;
+        return li;
+      }),
+    );
+    range.max = String(plan.steps.length);
+  };
+
+  const update = (k: number, withPop = false) => {
+    const prev = step;
+    step = k;
+    const done = plan.steps.slice(0, k);
+    const paid = done.reduce((a, s) => a + s.usd, 0);
+    const bb = done.reduce((a, s) => a + s.bb, 0);
+    const cash = plan.cruise - bb;
+    flows['o-paid'].update(paid);
+    flows['o-paid2'].update(paid);
+    flows['o-bb'].update(bb);
+    flows['o-bbpart'].update(bb);
+    flows['o-cash'].update(cash);
+    flows['o-own'].update(paid + cash);
+    flows['o-benefit'].update(Math.max(0, bb - paid));
+    flows['o-cruise'].update(plan.cruise);
+    bar.style.width = `${(bb / plan.cruise) * 100}%`;
+    stepsEl.querySelectorAll<HTMLElement>('.plan-step').forEach((li, i) => {
+      const on = i < k;
+      li.classList.toggle('opacity-35', !on);
+      li.querySelector('.step-dot')!.classList.toggle('!text-champagne', on);
+    });
+    range.value = String(k);
+    rangeLabel.textContent = `${k} / ${plan.steps.length}`;
+    if (withPop && k > prev && !reduce) {
+      pop.textContent = `+${fmt(plan.steps[k - 1].bb)} ББ`;
+      pop.animate(
+        [
+          { opacity: 0, transform: 'translateY(12px)' },
+          { opacity: 1, transform: 'translateY(-4px)', offset: 0.3 },
+          { opacity: 0, transform: 'translateY(-24px)' },
+        ],
+        { duration: 1000, easing: 'cubic-bezier(.16,1,.3,1)' },
+      );
+    }
+  };
+
+  const play = () => {
+    clearInterval(timer);
+    update(0);
+    if (reduce) return update(plan.steps.length);
+    let k = 0;
+    timer = window.setInterval(() => {
+      update(++k, true);
+      if (k >= plan.steps.length) clearInterval(timer);
+    }, 800);
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-plan-tab]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-plan-tab]').forEach((b) => b.setAttribute('aria-selected', String(b === btn)));
+      plan = plans.find((p) => p.id === btn.dataset.planTab)!;
+      renderSteps();
+      play();
+    }),
+  );
+  range.addEventListener('input', () => {
+    clearInterval(timer);
+    update(Number(range.value), true);
+  });
+  $('plan-play').addEventListener('click', play);
+
+  renderSteps();
+  update(plan.steps.length);
+  ScrollTrigger.create({ trigger: '#plan-steps', start: 'top 75%', once: true, onEnter: play });
+</script>

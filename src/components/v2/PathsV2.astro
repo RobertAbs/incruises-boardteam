@@ -1,0 +1,56 @@
+---
+import { Picture } from 'astro:assets';
+import venice from '../../assets/v2/venice.jpg';
+import pier from '../../assets/v2/ships-pier.jpg';
+import { whyMember, whyPartner } from '../../data/content';
+
+const paths = [
+  { n: 'I', title: 'Член клуба', sub: 'Путешествия', q: 'Зачем стать членом клуба inCruises?', items: whyMember, img: venice, alt: 'Венеция с воды', pos: 'object-center' },
+  { n: 'II', title: 'Член-партнёр', sub: 'Путешествия + бизнес', q: 'Зачем стать партнёром inCruises?', items: whyPartner, img: pier, alt: 'Два круизных лайнера у причала', pos: 'object-[50%_60%]' },
+];
+---
+
+<section id="paths" class="relative bg-ivory py-[clamp(90px,12vw,180px)] text-onyx">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <div class="max-w-[760px]">
+      <p class="v2-eyebrow mb-10 !text-[#9a7b3f]" data-reveal>Два пути</p>
+      <h2 class="v2-h" data-split>Выберите свой формат <em class="text-[#9a7b3f] italic">в&nbsp;клубе</em></h2>
+    </div>
+
+    <div class="mt-[clamp(50px,7vw,90px)] grid gap-6 lg:grid-cols-2">
+      {
+        paths.map((p) => (
+          <article class="group relative flex min-h-[640px] flex-col justify-end overflow-hidden text-ivory" data-mask>
+            <Picture
+              src={p.img}
+              alt={p.alt}
+              widths={[700, 1200]}
+              sizes="(min-width:1024px) 48vw, 100vw"
+              formats={['avif', 'webp']}
+              class={`absolute inset-0 h-full w-full object-cover transition-transform duration-[2s] ease-(--ease-out-expo) group-hover:scale-105 ${p.pos}`}
+            />
+            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,12,15,0.2)_0%,rgba(11,12,15,0.55)_40%,rgba(11,12,15,0.95)_100%)]" />
+            <div class="relative p-7 sm:p-10">
+              <div class="flex items-end justify-between border-b border-ivory/20 pb-6">
+                <div>
+                  <p class="font-inter text-[11px] tracking-[0.28em] text-champagne uppercase">{p.sub}</p>
+                  <h3 class="mt-2 font-serif text-[clamp(2.2rem,3.6vw,3.4rem)] leading-none font-light">{p.title}</h3>
+                </div>
+                <span class="font-serif text-6xl font-light text-champagne-2/70 italic">{p.n}</span>
+              </div>
+              <p class="mt-6 font-serif text-xl text-ivory/80 italic">{p.q}</p>
+              <ul class="mt-5 space-y-3">
+                {p.items.map((t) => (
+                  <li class="flex items-start gap-4 font-inter text-[15px] leading-snug font-light text-ivory/90">
+                    <span class="mt-2.5 h-px w-5 shrink-0 bg-champagne" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

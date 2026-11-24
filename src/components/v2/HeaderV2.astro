@@ -1,0 +1,76 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/incruises-logo.png';
+import boardteam from '../../assets/brand/boardteam.png';
+import { nav, contactLink } from '../../config';
+---
+
+<header id="v2-header" class="fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,transform] duration-700">
+  <div class="mx-auto flex h-20 max-w-[1400px] items-center justify-between gap-6 px-5 sm:px-8 lg:px-12">
+    <a href="#top" class="flex items-center gap-4" aria-label="inCruises — на главную">
+      <span class="grid h-9 place-items-center bg-ivory px-2.5">
+        <Image src={logo} alt="inCruises Independent Partner" class="h-[22px] w-auto" width={170} />
+      </span>
+      <span class="hidden h-6 w-px bg-ivory/25 sm:block"></span>
+      <Image src={boardteam} alt="BoardTeam International team" class="hidden h-7 w-auto opacity-80 sm:block" width={200} />
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex" aria-label="Разделы">
+      {
+        nav.map((n) => (
+          <a href={n.href} class="group relative py-2 font-inter text-[11px] font-medium tracking-[0.24em] text-ivory/75 uppercase transition-colors hover:text-ivory">
+            {n.label}
+            <span class="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-champagne transition-transform duration-500 group-hover:scale-x-100" />
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href={contactLink()} class="v2-btn border border-champagne/60 !px-5 !py-3 text-champagne hover:bg-champagne hover:text-onyx">Вступить</a>
+      <button id="v2-menu-btn" class="grid h-11 w-11 place-items-center text-ivory lg:hidden" aria-label="Открыть меню" aria-expanded="false" aria-controls="v2-menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 9h18M3 15h18"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div class="h-px bg-gradient-to-r from-transparent via-champagne/30 to-transparent"></div>
+
+  <div id="v2-menu" class="pointer-events-none fixed inset-0 top-20 bg-onyx/97 opacity-0 backdrop-blur-xl transition-opacity duration-500 lg:hidden">
+    <nav class="flex flex-col gap-1 px-6 pt-10">
+      {
+        nav.map((n, i) => (
+          <a href={n.href} class="border-b border-ivory/10 py-5 font-serif text-4xl font-light text-ivory">
+            <span class="mr-4 font-inter text-xs tracking-[0.2em] text-champagne">0{i + 1}</span>
+            {n.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById('v2-header')!;
+  const btn = document.getElementById('v2-menu-btn')!;
+  const menu = document.getElementById('v2-menu')!;
+  let open = false;
+  const set = (v: boolean) => {
+    open = v;
+    btn.setAttribute('aria-expanded', String(v));
+    menu.classList.toggle('opacity-0', !v);
+    menu.classList.toggle('pointer-events-none', !v);
+    header.classList.toggle('bg-onyx/85', v || scrollY > 40);
+  };
+  btn.addEventListener('click', () => set(!open));
+  document.addEventListener('nav:close', () => set(false));
+  let last = 0;
+  const onScroll = () => {
+    const y = scrollY;
+    header.classList.toggle('bg-onyx/85', y > 40 || open);
+    header.classList.toggle('backdrop-blur-xl', y > 40);
+    header.style.transform = y > 500 && y > last && !open ? 'translateY(-100%)' : '';
+    last = y;
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

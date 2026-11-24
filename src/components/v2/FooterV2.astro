@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/incruises-logo.png';
+import boardteam from '../../assets/brand/boardteam.png';
+import { nav, site } from '../../config';
+import { disclaimer } from '../../data/content';
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-onyx text-ivory">
+  <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <p class="overflow-hidden border-t border-ivory/10 pt-16 font-serif text-[clamp(3rem,11vw,10rem)] leading-[0.9] font-light whitespace-nowrap text-ivory/90">
+      inCruises <em class="text-champagne-2 italic">BoardTeam</em>
+    </p>
+    <div class="mt-14 flex flex-col justify-between gap-10 border-t border-ivory/10 py-10 md:flex-row md:items-center">
+      <div class="flex items-center gap-4">
+        <span class="grid h-10 place-items-center bg-ivory px-2.5">
+          <Image src={logo} alt="inCruises Independent Partner" class="h-6 w-auto" width={200} />
+        </span>
+        <Image src={boardteam} alt="BoardTeam International team" class="h-8 w-auto opacity-80" width={220} />
+      </div>
+      <nav class="flex flex-wrap gap-x-8 gap-y-3" aria-label="Разделы в подвале">
+        {nav.map((n) => <a href={n.href} class="font-inter text-[11px] tracking-[0.24em] text-ivory/60 uppercase transition hover:text-champagne">{n.label}</a>)}
+      </nav>
+    </div>
+    <p class="max-w-[900px] font-inter text-xs leading-relaxed font-light text-ivory/40">
+      <span class="text-champagne/80">Важная информация.</span>
+      {disclaimer}
+    </p>
+    <div class="flex flex-col justify-between gap-3 py-10 font-inter text-[11px] tracking-wide text-ivory/35 sm:flex-row">
+      <p>© {year} {site.team} · Независимый партнёр inCruises</p>
+      <p>inCruises® — зарегистрированный товарный знак inGroup International</p>
+    </div>
+  </div>
+</footer>

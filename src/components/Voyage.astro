@@ -1,6 +1,16 @@
 ---
 import Plane from './art/Plane.astro';
 
+interface Props {
+  variant?: 'v1' | 'v2';
+}
+const { variant = 'v1' } = Astro.props;
+const v2 = variant === 'v2';
+/** Цвета и шрифты сцены для двух вариантов дизайна */
+const t = v2
+  ? { dot: '#e6cf9b', dotOp: '.13', flight: '#f4efe6', route: '#c8a96a', routeBg: '#f4efe6', home: '#e6cf9b', label: '#f4efe6', font: 'Cormorant Garamond Variable, serif', fs: 22, fw: 400, hull: '#0b0c0f', funnel: '#c8a96a' }
+  : { dot: '#6fd8ff', dotOp: '.22', flight: 'white', route: '#f7941d', routeBg: '#6fd8ff', home: '#6fd8ff', label: 'white', font: 'Manrope Variable, sans-serif', fs: 16, fw: 700, hull: '#0a2244', funnel: '#f7941d' };
+
 const home = { x: 1010, y: 150, name: 'Астана' };
 const ports = [
   { x: 330, y: 300, name: 'Барселона', dx: -18, dy: 32 },
@@ -30,56 +40,60 @@ for (let x = 10; x < 1200; x += 16)
   }
 ---
 
-<section id="voyage" class="relative bg-navy text-white">
+<section id="voyage" class:list={['relative', v2 ? 'bg-onyx text-ivory' : 'bg-navy text-white']}>
   <div id="voyage-pin" class="relative flex flex-col justify-center overflow-hidden py-20 md:min-h-[100svh]">
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_40%_55%,#0f5fb5_0%,transparent_60%)] opacity-60"></div>
+    <div class:list={['pointer-events-none absolute inset-0 opacity-60', v2 ? 'bg-[radial-gradient(ellipse_at_40%_55%,#2a2418_0%,transparent_60%)]' : 'bg-[radial-gradient(ellipse_at_40%_55%,#0f5fb5_0%,transparent_60%)]']}></div>
 
-    <div class="container-x relative">
+    <div class:list={['relative', v2 ? 'mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12' : 'container-x']}>
       <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div class="max-w-[640px]">
-          <p class="eyebrow mb-5 bg-white/10 text-aqua" data-reveal>Ваш маршрут</p>
-          <h2 class="h-section" data-split>Перелёт, лайнер и&nbsp;новые страны каждый день</h2>
+          <p class:list={[v2 ? 'v2-eyebrow mb-8' : 'eyebrow mb-5 bg-white/10 text-aqua']} data-reveal>Ваш маршрут</p>
+          {v2 ? (
+            <h2 class="v2-h" data-split>Перелёт, лайнер и&nbsp;<em class="text-champagne-2 italic">новые страны каждый день</em></h2>
+          ) : (
+            <h2 class="h-section" data-split>Перелёт, лайнер и&nbsp;новые страны каждый день</h2>
+          )}
         </div>
         <div class="flex gap-8" data-reveal>
           <div>
-            <p class="text-xs font-bold tracking-wider text-white/50 uppercase">Портов</p>
-            <p class="num text-5xl text-brand"><span id="v-ports">6</span></p>
+            <p class:list={[v2 ? 'font-inter text-[11px] tracking-[0.22em] text-ivory/50 uppercase' : 'text-xs font-bold tracking-wider text-white/50 uppercase']}>Портов</p>
+            <p class:list={[v2 ? 'v2-num text-6xl text-champagne-2' : 'num text-5xl text-brand']}><span id="v-ports">6</span></p>
           </div>
           <div>
-            <p class="text-xs font-bold tracking-wider text-white/50 uppercase">Морских миль</p>
-            <p class="num text-5xl"><span id="v-miles">1 850</span></p>
+            <p class:list={[v2 ? 'font-inter text-[11px] tracking-[0.22em] text-ivory/50 uppercase' : 'text-xs font-bold tracking-wider text-white/50 uppercase']}>Морских миль</p>
+            <p class:list={[v2 ? 'v2-num text-6xl' : 'num text-5xl']}><span id="v-miles">1 850</span></p>
           </div>
         </div>
       </div>
 
       <div class="relative mt-8 overflow-hidden md:overflow-visible">
         <svg id="voyage-map" viewBox="0 0 1200 560" class="-ml-[40%] h-auto w-[165%] max-w-none md:ml-0 md:w-full" role="img" aria-label="Маршрут: перелёт из Астаны в Барселону и круиз по Средиземному морю до Стамбула">
-          <g fill="#6fd8ff" opacity=".22">
+          <g fill={t.dot} opacity={t.dotOp}>
             {dots.map((d) => <circle cx={d.x} cy={d.y} r="2.2" />)}
           </g>
 
           <!-- Перелёт -->
-          <path d={flight} fill="none" stroke="white" stroke-opacity=".18" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"></path>
-          <path id="v-flight" d={flight} fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"></path>
+          <path d={flight} fill="none" stroke={t.flight} stroke-opacity=".18" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"></path>
+          <path id="v-flight" d={flight} fill="none" stroke={t.flight} stroke-width={v2 ? 1.2 : 2.5} stroke-dasharray="2 8" stroke-linecap="round"></path>
 
           <!-- Морской путь -->
-          <path d={sea} fill="none" stroke="#6fd8ff" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"></path>
-          <path id="v-sea" d={sea} fill="none" stroke="#f7941d" stroke-width="4" stroke-linecap="round"></path>
+          <path d={sea} fill="none" stroke={t.routeBg} stroke-opacity=".15" stroke-width={v2 ? 1.5 : 3} stroke-linecap="round"></path>
+          <path id="v-sea" d={sea} fill="none" stroke={t.route} stroke-width={v2 ? 2 : 4} stroke-linecap="round"></path>
 
           <!-- Дом -->
           <g>
-            <circle cx={home.x} cy={home.y} r="16" fill="#6fd8ff" opacity=".18"></circle>
-            <circle cx={home.x} cy={home.y} r="6" fill="#6fd8ff"></circle>
-            <text x={home.x + 16} y={home.y - 14} fill="white" font-size="18" font-weight="700" font-family="Manrope Variable, sans-serif">{home.name}</text>
+            <circle cx={home.x} cy={home.y} r="16" fill={t.home} opacity=".18"></circle>
+            <circle cx={home.x} cy={home.y} r="6" fill={t.home}></circle>
+            <text x={home.x + 16} y={home.y - 14} fill={t.label} font-size={t.fs + 2} font-weight={t.fw} font-family={t.font} font-style={v2 ? 'italic' : undefined}>{home.name}</text>
           </g>
 
           <!-- Порты -->
           {
             ports.map((p, i) => (
               <g class="v-port" data-i={i} opacity=".35">
-                <circle class="v-ring" cx={p.x} cy={p.y} r="14" fill="#f7941d" opacity="0" />
-                <circle cx={p.x} cy={p.y} r="6.5" fill="white" stroke="#f7941d" stroke-width="3" />
-                <text x={p.x + p.dx} y={p.y + p.dy} text-anchor="middle" fill="white" font-size="16" font-weight="700" font-family="Manrope Variable, sans-serif">
+                <circle class="v-ring" cx={p.x} cy={p.y} r="14" fill={t.route} opacity="0" />
+                <circle cx={p.x} cy={p.y} r={v2 ? 5 : 6.5} fill={v2 ? '#0b0c0f' : 'white'} stroke={t.route} stroke-width={v2 ? 2 : 3} />
+                <text x={p.x + p.dx} y={p.y + p.dy} text-anchor="middle" fill={t.label} font-size={t.fs} font-weight={t.fw} font-family={t.font} font-style={v2 ? 'italic' : undefined}>
                   {p.name}
                 </text>
               </g>
@@ -93,10 +107,10 @@ for (let x = 10; x < 1200; x += 16)
           <g id="v-ship" opacity="0">
             <g transform="translate(-22 -16)">
               <path d="M2 18h40l-6 10H8z" fill="#ffffff"></path>
-              <path d="M5 24h34l-3 4H8z" fill="#0a2244"></path>
+              <path d="M5 24h34l-3 4H8z" fill={t.hull}></path>
               <rect x="10" y="11" width="24" height="7" rx="1.5" fill="#ffffff"></rect>
               <rect x="15" y="5" width="13" height="6" rx="1.5" fill="#ffffff"></rect>
-              <rect x="22" y="0" width="6" height="6" fill="#f7941d"></rect>
+              <rect x="22" y="0" width="6" height="6" fill={t.funnel}></rect>
             </g>
           </g>
         </svg>

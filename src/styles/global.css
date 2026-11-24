@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/unbounded';
 @import '@fontsource-variable/manrope';
+@import '@fontsource-variable/cormorant-garamond';
+@import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+@import '@fontsource-variable/inter';
 
 @theme {
   --font-display: 'Unbounded Variable', 'Unbounded', system-ui, sans-serif;
@@ -20,6 +23,18 @@
   --color-gold: #d9b45a;
   --color-muted: #5b6b82;
 
+  /* VIP-версия (v2) */
+  --font-serif: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+  --font-inter: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --color-onyx: #0b0c0f;
+  --color-onyx-2: #121419;
+  --color-smoke: #1a1d23;
+  --color-ivory: #f4efe6;
+  --color-ivory-2: #ebe4d8;
+  --color-champagne: #c8a96a;
+  --color-champagne-2: #e6cf9b;
+  --color-stone: #8b857a;
+
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --radius-4xl: 2rem;
   --radius-5xl: 2.75rem;
@@ -27,6 +42,7 @@
 
 @layer base {
   html {
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -113,6 +129,39 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+
+/* ---------- VIP (v2) ---------- */
+@utility v2-eyebrow {
+  @apply inline-flex items-center gap-3 font-inter text-[11px] font-medium tracking-[0.32em] text-champagne uppercase;
+  &::before {
+    content: '';
+    width: 2.25rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.7;
+  }
+}
+@utility v2-h {
+  @apply font-serif text-[clamp(2.5rem,5.6vw,5.2rem)] leading-[0.98] font-light tracking-[-0.015em] text-balance;
+}
+@utility v2-lead {
+  @apply font-inter text-[clamp(0.98rem,1.2vw,1.1rem)] leading-[1.75] font-light text-pretty;
+}
+@utility v2-btn {
+  @apply relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 font-inter text-[12px] font-medium tracking-[0.22em] whitespace-nowrap uppercase transition-[color,background-color,border-color] duration-500;
+}
+@utility v2-btn-gold {
+  @apply v2-btn bg-champagne text-onyx hover:bg-champagne-2;
+}
+@utility v2-btn-line {
+  @apply v2-btn border border-current hover:bg-ivory hover:text-onyx hover:border-ivory;
+}
+@utility v2-num {
+  @apply font-serif font-light tracking-[-0.02em] tabular-nums [font-feature-settings:'lnum'];
+}
+.v2 number-flow {
+  font-feature-settings: 'lnum';
+}
 
 /* Градиентный текст внутри разбитых на слова заголовков */
 .text-gradient-brand .split-word > span {
